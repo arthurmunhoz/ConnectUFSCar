@@ -54,6 +54,7 @@ public class LoginActivity extends Activity {
         if (v.getId() == R.id.tv_cadastrese) {
             Intent i = new Intent(this, SignUpActivity.class);
             startActivity(i);
+
         }
 
         //------------------------------------------------------------------------------------------
@@ -101,7 +102,6 @@ public class LoginActivity extends Activity {
                         editor.putString("email", response.body().getEmail()).apply();
                         editor.putString("usertype", response.body().getUser_type()).apply();
                         editor.putString("image_url", response.body().getUser_photo()).apply();
-                        Toast.makeText(getApplicationContext(), response.body().getUser_photo(), Toast.LENGTH_LONG).show();
                         editor.putString("username", response.body().getUsername()).apply();
 
                         //-------------------------------------------------------------------------

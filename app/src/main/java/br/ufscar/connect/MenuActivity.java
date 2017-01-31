@@ -81,7 +81,7 @@ public class MenuActivity extends TabActivity {
         for (int i = 0; i < tw.getChildCount(); ++i) {
             final View tabView = tw.getChildTabViewAt(i);
             final TextView tv = (TextView) tabView.findViewById(android.R.id.title);
-            tv.setTextSize(16);
+            tv.setTextSize(15);
         }
 
     }

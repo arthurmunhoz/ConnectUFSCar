@@ -28,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -40,10 +42,11 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.ufscar.connect.Models.Report;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
-import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
@@ -55,9 +58,10 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
     //DECLARANDO VARIAVEIS
     //estaticas
-    public static final int CAMERA_REQUEST = 10;
+    public static final int CAMERA_REQUEST = 0;
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 2;
+    public static final int REQUEST_PERMISSION_SETTING = 3;
     Bitmap cameraImage;
 
     private ImageView iv_foto;
@@ -71,7 +75,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     String address;
     String category;
     String description;
-    String imagem_url;
+    String image_url;
     Uri picUri;
 
     GoogleApiClient mGoogleApiClient;
@@ -140,6 +144,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
         //Se o usuario clicar no botao CONCLUIDO, exibe-se uma mensagem e retorna para a activity MenuActivity(que redireciona o usuario para FeedActivity)
         if (v.getId() == R.id.btn_concluido) {
+
             Intent i = new Intent(this, MenuActivity.class);
 
             //Recebendo informacoes e textos digitados pelo usuario
@@ -147,7 +152,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             int position = et_category.getSelectedItemPosition(); //recebe a posiçao do item selecionado no spinner (int)
             category = et_category.getItemAtPosition(position).toString(); //recebe o item selecionado (string)
             description = et_description.getText() + "";
-            imagem_url = "";
+            image_url = "";
             Date date = new Date(System.currentTimeMillis());
             created_at = date.toString();
 
@@ -180,7 +185,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
             //-------------------------------------------------------------------------------------
             //Enviando textos ao servidor utilizando Retrofit
-            api.reportCreate(address, category, description, USER_ID, imagem_url, created_at).enqueue(new Callback<Report>() {
+            api.reportCreate(address, category, description, USER_ID, image_url, created_at).enqueue(new Callback<Report>() {
 
                 @Override
                 public void onResponse(Response<Report> response, Retrofit retrofit) {
@@ -189,6 +194,21 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "DENÚNCIA REALIZADA COM SUCESSO", Toast.LENGTH_LONG).show();
+
+                        //-------------------------------------------------------------------------------------
+                        //Enviando a foto tirada ao servidor Cloudinary
+                        Map config = new HashMap();
+                        config.put("cloud_name", "cloud-connectufscar");
+                        config.put("api_key", "726282638648912");
+                        config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+                        Cloudinary mobileCloudinary = new Cloudinary(config);
+
+                        try {
+                            Map resultMap = mobileCloudinary.uploader().upload(response.body().getProblemPhoto(), ObjectUtils.emptyMap());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
 
                         //Volta a tela de Feed
                         Intent i = new Intent(ReportActivity.this, MenuActivity.class);
@@ -212,12 +232,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                     Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
-
-            //-------------------------------------------------------------------------------------
-            //Enviando a foto tirada ao servidor Cloudinary
-
-
-
 
         }
 
@@ -244,8 +258,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
-                            public static final int REQUEST_PERMISSION_SETTING = 1;
-
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //Prompt the user once explanation has been shown
@@ -265,11 +277,10 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
             }
 
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (mLastLocation != null) {
-                et_address.setText(String.valueOf(mLastLocation.getLatitude()));
+                et_address.setText(String.valueOf((mLastLocation.getLatitude())));
                 et_address.append(", " + String.valueOf(mLastLocation.getLongitude()));
             }
 
@@ -342,7 +353,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                                 exception.printStackTrace();
                             }
                         });
-                        builder.build().load(picUri).into(iv_foto);
+                        builder.build().load(picUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
 
 
                     } else {
@@ -405,7 +416,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                             exception.printStackTrace();
                         }
                     });
-                    builder.build().load(picUri).transform(new CropCircleTransformation()).into(iv_foto);
+                    builder.build().load(picUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
 
                 }
 

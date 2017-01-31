@@ -353,7 +353,7 @@ public class EditProfileActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("cameraImage", cameraImage);
-        outState.putParcelable("picUri", picUri);
+        outState.putParcelable("imageUri", picUri);
     }
 
     // Recover the saved state when the activity is recreated.
@@ -362,7 +362,7 @@ public class EditProfileActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
 
         cameraImage = savedInstanceState.getParcelable("cameraImage");
-        picUri = savedInstanceState.getParcelable("picUri");
+        picUri = savedInstanceState.getParcelable("imageUri");
 
     }
 
@@ -502,14 +502,14 @@ public class EditProfileActivity extends Activity {
                         try {
                             mobileCloudinary2.uploader().upload(is2, ObjectUtils.emptyMap());
                             //Toast.makeText(getApplicationContext(), is2.toString(), Toast.LENGTH_LONG).show();
-                            Log.e(">>>IMAGE_URI<<< :", picUri.toString());
+                            Log.e(">>>IMAGE_URI<<< :", imageUri.toString());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         */
 
                         //iv_profile_pic.setImageBitmap(cameraImage);
-                        //iv_profile_pic.setImageURI(picUri);
+                        //iv_profile_pic.setImageURI(imageUri);
                         iv_profile_pic.setBackground(null);
                         Picasso.with(this).load(picUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
                         iv_profile_pic.setVisibility(View.VISIBLE);
