@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="br.ufscar.connect.FeedActivity">
+
+    <item android:id="@+id/action_novas" android:title="Mais novas"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_antigas" android:title="Mais antigas"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_problemas" android:title="Problemas reportados"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_avaliacoes" android:title="Espacos Avaliados"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+</menu>

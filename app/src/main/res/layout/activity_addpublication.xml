@@ -1,0 +1,117 @@
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">//
+
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/btns_HOLDER"
+        android:background="@drawable/fundoapp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/btn_avaliar"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btnfundopublred"
+            android:layout_alignParentStart="true"
+            android:alpha="0.85">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CRIAR UMA NOVA PUBLICAÇÃO"
+                android:id="@+id/tv_title_add"
+                android:textSize="22dp"
+                android:textColor="#ffdedede"
+                android:layout_below="@+id/tv_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Você está prestes de"
+                android:id="@+id/tv_content"
+                android:textColor="#ffdedede"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:textAlignment="center"
+                android:layout_below="@+id/imageView2"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="         Escolha uma das opções abaixo                e colabore com a comunidade da UFSCar!"
+                android:id="@+id/tv_content2"
+                android:layout_marginLeft="35dp"
+                android:layout_marginRight="20dp"
+                android:layout_below="@+id/tv_title_add"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:textSize="16dp"
+                android:textColor="#ffdedede" />
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:id="@+id/imageView2"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="19dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/thumbsupcircular2" />
+
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:id="@+id/btn_reportar"
+            android:clickable="true"
+            android:onClick="onButtonClick"
+            android:enabled="true"
+            android:background="@drawable/btnfundored"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="REPORTAR  PROBLEMA"
+            android:textColor="#ffdedede"
+            android:gravity="center_vertical|center_horizontal"
+            android:textSize="20dp"
+            android:typeface="normal"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="30dp" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:id="@+id/btn_avaliar"
+            android:clickable="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:onClick="onButtonClick"
+            android:enabled="true"
+            android:background="@drawable/btnfundoblue"
+            android:text="AVALIAR  ESPAÇO"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:textColor="#ffdedede"
+            android:textSize="20dp"
+            android:layout_above="@+id/btn_reportar"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="30dp"
+            android:typeface="normal"
+            android:layout_marginTop="10dp" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

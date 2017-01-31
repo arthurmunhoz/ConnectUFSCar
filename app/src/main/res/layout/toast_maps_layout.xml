@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/toast_layout_root"
+    android:background="#a00c0c0c">
+
+
+    <TextView
+        android:id="@+id/tv_cliqueem"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:text="CLIQUE EM"
+        android:textSize="14dp"
+        android:gravity="center"
+        android:textColor="#ffffffff"
+        android:textAlignment="viewEnd"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/iv_marker"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginBottom="0dp"
+        android:typeface="normal"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:id="@+id/iv_marker"
+        android:background="@drawable/markergooglefinal"
+        android:layout_width="23dp"
+        android:layout_height="35dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/tv_cliqueem"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+
+    <TextView
+        android:id="@+id/tv_paraassopcoes"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:text="PARA MAIS OPÇÕES"
+        android:textSize="13dp"
+        android:gravity="left|center"
+        android:textColor="#ffffffff"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/iv_marker"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="0dp"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/iv_marker" />
+
+
+</RelativeLayout>

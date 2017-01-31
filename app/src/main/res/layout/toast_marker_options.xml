@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#a00c0c0c">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="= Rota até o local selecionado"
+        android:id="@+id/tv_route"
+        android:textColor="#ffffffff"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/iv_route"
+        android:layout_marginLeft="5dp"
+        android:layout_alignEnd="@+id/tv_maps"
+        android:layout_above="@+id/iv_maps"
+        android:gravity="left|center_vertical"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="= Visualização no Google Maps"
+        android:id="@+id/tv_maps"
+        android:textColor="#ffffffff"
+        android:layout_toEndOf="@+id/iv_route"
+        android:layout_alignTop="@+id/iv_maps"
+        android:layout_alignBottom="@+id/iv_maps"
+        android:layout_marginLeft="5dp"
+        android:gravity="left|center_vertical"
+        android:layout_marginRight="15dp" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/iv_route"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/iconroute"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="5dp" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/iv_maps"
+        android:layout_alignParentStart="true"
+        android:layout_alignLeft="@+id/iv_route"
+        android:layout_alignRight="@+id/iv_route"
+        android:background="@drawable/icongooglemaps"
+        android:layout_below="@+id/iv_route"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="5dp" />
+</RelativeLayout>

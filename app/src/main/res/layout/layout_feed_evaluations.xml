@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="15dp"
+        android:background="#1fe3000a"
+        android:id="@+id/cv_separator"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:id="@+id/iv_user_photo"
+        android:layout_below="@+id/cv_separator"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_name"
+        android:layout_alignTop="@+id/iv_user_photo"
+        android:layout_toRightOf="@+id/iv_user_photo"
+        android:textSize="14dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/tv_user_type"
+        android:gravity="top|left"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_user_type"
+        android:textSize="14dp"
+        android:layout_above="@+id/tv_date"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/iv_user_photo"
+        android:layout_toEndOf="@+id/iv_user_photo"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/tv_date"
+        android:textSize="14dp"
+        android:layout_alignBottom="@+id/iv_user_photo"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/iv_user_photo"
+        android:layout_toEndOf="@+id/iv_user_photo"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/tv_place_name"
+        android:layout_below="@+id/tv_date"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="15dp"
+        android:id="@+id/tv_infra"
+        android:textSize="12dp"
+        android:layout_below="@+id/tv_place_name"
+        android:layout_alignLeft="@+id/tv_date"
+        android:layout_alignStart="@+id/tv_date"
+        android:layout_marginTop="10dp" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_acess"
+        android:layout_below="@+id/tv_infra"
+        android:layout_alignLeft="@+id/tv_infra"
+        android:layout_alignStart="@+id/tv_infra"
+        android:layout_alignRight="@+id/tv_infra"
+        android:layout_alignEnd="@+id/tv_infra"
+        android:textSize="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_limpeza"
+        android:layout_below="@+id/tv_acess"
+        android:layout_alignLeft="@+id/tv_acess"
+        android:layout_alignStart="@+id/tv_acess"
+        android:layout_alignRight="@+id/tv_acess"
+        android:layout_alignEnd="@+id/tv_acess"
+        android:textSize="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_seg"
+        android:layout_below="@+id/tv_limpeza"
+        android:layout_alignRight="@+id/tv_limpeza"
+        android:layout_alignEnd="@+id/tv_limpeza"
+        android:layout_alignLeft="@+id/tv_limpeza"
+        android:layout_alignStart="@+id/tv_limpeza"
+        android:textSize="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_geral"
+        android:layout_below="@+id/tv_seg"
+        android:layout_alignLeft="@+id/tv_seg"
+        android:layout_alignStart="@+id/tv_seg"
+        android:layout_alignRight="@+id/tv_seg"
+        android:layout_alignEnd="@+id/tv_seg"
+        android:textSize="12dp"
+        android:layout_marginBottom="20dp" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:id="@+id/rb_infra"
+        android:theme="@style/RatingBar"
+        style="?attr/ratingBarStyleSmall"
+        android:layout_alignTop="@+id/tv_infra"
+        android:layout_toRightOf="@+id/tv_infra"
+        android:layout_toEndOf="@+id/tv_infra"
+        android:layout_marginLeft="15dp"
+        android:stepSize="0.5"
+        android:numStars="5" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rb_acess"
+        android:theme="@style/RatingBar"
+        style="?attr/ratingBarStyleSmall"
+        android:layout_below="@+id/rb_infra"
+        android:layout_alignLeft="@+id/rb_infra"
+        android:layout_alignStart="@+id/rb_infra"
+        android:stepSize="0.5"
+        android:rating="4"
+        android:numStars="5" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rb_limpeza"
+        android:layout_alignTop="@+id/tv_limpeza"
+        android:layout_alignStart="@+id/rb_acess"
+        android:theme="@style/RatingBar"
+        style="?attr/ratingBarStyleSmall"
+        android:stepSize="0.5"
+        android:rating="4"
+        android:numStars="5" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rb_seg"
+        android:layout_alignTop="@+id/tv_seg"
+        android:layout_alignStart="@+id/rb_acess"
+        android:theme="@style/RatingBar"
+        style="?attr/ratingBarStyleSmall"
+        android:stepSize="0.5"
+        android:rating="4"
+        android:numStars="5" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rb_geral"
+        android:theme="@style/RatingBar"
+        style="?attr/ratingBarStyleSmall"
+        android:layout_below="@+id/tv_seg"
+        android:layout_alignLeft="@+id/rb_seg"
+        android:layout_alignStart="@+id/rb_seg"
+        android:stepSize="0.5"
+        android:rating="4"
+        android:numStars="5"
+        android:layout_marginBottom="20dp" />
+
+
+</RelativeLayout>
+

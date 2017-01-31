@@ -1,0 +1,139 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="5dp"
+    tools:context="br.ufscar.connect.ProfileActivity"
+    android:background="#66f0f0f0">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:id="@+id/InfosProfile"
+        android:background="#dc2b2b2b"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:alpha="100">
+
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/btn_edit_profile"
+            android:background="@drawable/useredit"
+            android:clickable="true"
+            android:onClick="onButtonClick"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="10dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_useremail"
+            android:textSize="14dp"
+            android:text="arthurmunhoz@hotmail.com"
+            android:textColor="#ffffffff"
+            android:layout_below="@+id/tv_username"
+            android:layout_alignLeft="@+id/tv_usertype"
+            android:layout_alignStart="@+id/tv_usertype"
+            android:gravity="center"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_usertype"
+            android:textSize="14dp"
+            android:gravity="bottom|center"
+            android:text="Aluno de Graduação"
+            android:textColor="#ffffffff"
+            android:layout_alignLeft="@+id/tv_name"
+            android:layout_alignStart="@+id/tv_name"
+            android:layout_marginRight="8dp"
+            android:layout_below="@+id/tv_useremail"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:textSize="16dp"
+            android:id="@+id/tv_name"
+            android:textStyle="bold"
+            android:text="Arthur Regatieri Munhoz"
+            android:textColor="#ffffffff"
+            android:lines="2"
+            android:maxLines="2"
+            android:layout_below="@+id/iv_profile_picture"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center" />
+
+        <ImageView
+            android:layout_width="95dp"
+            android:layout_height="95dp"
+            android:id="@+id/iv_profile_picture"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="aMunhoz21"
+            android:id="@+id/tv_username"
+            android:layout_alignLeft="@+id/tv_usertype"
+            android:layout_alignStart="@+id/tv_usertype"
+            android:textColor="#ffffffff"
+            android:textSize="14dp"
+            android:layout_alignRight="@+id/tv_name"
+            android:layout_alignEnd="@+id/tv_name"
+            android:textStyle="italic"
+            android:layout_below="@+id/tv_name"
+            android:gravity="center" />
+
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lv_my_publications"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_titlemypublications"
+        android:layout_marginTop="0dp" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:text="MINHAS DENÚNCIAS"
+        android:id="@+id/tv_titlemypublications"
+        android:textSize="18dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:background="@drawable/btnfundo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/InfosProfile"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_expand"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/tv_titlemypublications"
+        android:layout_alignBottom="@+id/tv_titlemypublications"
+        android:background="@drawable/expandup"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+        android:onClick="onButtonClick" />
+
+</RelativeLayout>

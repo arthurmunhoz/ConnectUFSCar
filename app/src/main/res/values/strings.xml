@@ -1,0 +1,149 @@
+<resources>
+
+    <string name="app_name">Connect UFSCar</string>
+    <string name="action_settings">Sobre o App</string>
+    <string name="title_activity_cadastro">Novo Usuário</string>
+    <string name="tabfeed">FEED</string>
+    <string name="tabmapa">MAPA</string>
+    <string name="tabperfil">PERFIL</string>
+    <string name="title_activity_feed">Ordenar por</string>
+    <string name="title_activity_mapa">Visualizar</string>
+    <string name="title_activity_perfil">Menu</string>
+    <string name="title_activity_add">Agora é com VOCÊ!</string>
+    <string name="title_activity_reportar">Reportar um Problema</string>
+    <string name="title_activity_avaliar">Avaliar um Espaço</string>
+
+    <string-array name="lista_espacos">
+        <item>Selecione o espaço</item>
+        <item>A.T. 01</item>
+        <item>A.T. 02</item>
+        <item>A.T. 04</item>
+        <item>A.T. 05</item>
+        <item>A.T. 06</item>
+        <item>A.T. 07</item>
+        <item>A.T. 08</item>
+        <item>A.T. 09</item>
+        <item>A.T. 10</item>
+        <item>Alojamento Estudantil </item>
+        <item>Anfiteatro Bento Prado</item>
+        <item>Atlética UFSCar</item>
+        <item>Biblioteca Comunitária - BCo</item>
+        <item>Depto. de Botânica</item>
+        <item>Depto. de Computação</item>
+        <item>Depto. de Matemática</item>
+        <item>Depto. de Estatística</item>
+        <item>Depto. de Enfermagem</item>
+        <item>Depto. de Medicina</item>
+        <item>Depto. de Química</item>
+        <item>Depto. de Eng. de Produção</item>
+        <item>Depto. de Eng. Civil</item>
+        <item>Depto. de Eng. Elétrica</item>
+        <item>Depto. de Eng. Química</item>
+        <item>Depto. de Eng. de Materiais</item>
+        <item>Depto. de Ciências Sociais</item>
+        <item>Depto. de Psicologia</item>
+        <item>Depto. de Letras</item>
+        <item>Depto. de Física</item>
+        <item>Depto. de Fisioterapia</item>
+        <item>Depto. de Educação Física</item>
+        <item>Depto. de Terapia Ocupacional</item>
+        <item>Ginásio Poliesportivo</item>
+        <item>Museu de História Natural</item>
+        <item>Observatório</item>
+        <item>Palquinho do DCE</item>
+        <item>Piscina</item>
+        <item>Praça da Bandeira</item>
+        <item>Pró-Reitoria de Graduação - ProGrad</item>
+        <item>Portaria Norte</item>
+        <item>Portaria Sul</item>
+        <item>Quadras Poliesportivas</item>
+        <item>Rádio UFSCar</item>
+        <item>Reitoria</item>
+        <item>Restaurante Universitário - RU</item>
+        <item>Secretaria de Informática - SIn</item>
+        <item>Unidade de Atendimento a Criança</item>
+        <item>Unidade Saúde-Escola - USE</item>
+    </string-array>
+
+    <string-array name="lista_espacos2">
+        <item>Para onde deseja ir? Clique aqui!</item>
+        <item>A.T. 01</item>
+        <item>A.T. 02</item>
+        <item>A.T. 04</item>
+        <item>A.T. 05</item>
+        <item>A.T. 06</item>
+        <item>A.T. 07</item>
+        <item>A.T. 08</item>
+        <item>A.T. 09</item>
+        <item>A.T. 10</item>
+        <item>Alojamento Estudantil </item>
+        <item>Anfiteatro Bento Prado</item>
+        <item>Atlética UFSCar</item>
+        <item>Biblioteca Comunitária - BCo</item>
+        <item>Depto. de Botânica</item>
+        <item>Depto. de Computação</item>
+        <item>Depto. de Matemática</item>
+        <item>Depto. de Estatística</item>
+        <item>Depto. de Enfermagem</item>
+        <item>Depto. de Medicina</item>
+        <item>Depto. de Química</item>
+        <item>Depto. de Eng. de Produção</item>
+        <item>Depto. de Eng. Civil</item>
+        <item>Depto. de Eng. Elétrica</item>
+        <item>Depto. de Eng. Química</item>
+        <item>Depto. de Eng. de Materiais</item>
+        <item>Depto. de Ciências Sociais</item>
+        <item>Depto. de Psicologia</item>
+        <item>Depto. de Letras</item>
+        <item>Depto. de Física</item>
+        <item>Depto. de Fisioterapia</item>
+        <item>Depto. de Educação Física</item>
+        <item>Depto. de Terapia Ocupacional</item>
+        <item>Ginásio Poliesportivo</item>
+        <item>Museu de História Natural</item>
+        <item>Observatório</item>
+        <item>Palquinho do DCE</item>
+        <item>Piscina</item>
+        <item>Praça da Bandeira</item>
+        <item>Pró-Reitoria de Graduação - ProGrad</item>
+        <item>Portaria Norte</item>
+        <item>Portaria Sul</item>
+        <item>Quadras Poliesportivas</item>
+        <item>Rádio UFSCar</item>
+        <item>Reitoria</item>
+        <item>Restaurante Universitário - RU</item>
+        <item>Secretaria de Informática - SIn</item>
+        <item>Unidade de Atendimento a Criança</item>
+        <item>Unidade Saúde-Escola - USE</item>
+    </string-array>
+
+    <string-array name="lista_categorias">
+        <item>Selecione a categoria</item>
+        <item>Poluição de Água</item>
+        <item>Buracos na Via/Calçada</item>
+        <item>Vazamento de Água</item>
+        <item>Falta de Sinalização</item>
+        <item>Entulho</item>
+        <item>Danos ao Patrimônio</item>
+        <item>Problemas Elétricos</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string name="preference_file_key">Connect_UFSCar_SHARED_PREFERENCES</string>
+
+    <string-array name="tipos_usuario">
+        <item>Selecione o tipo de usuário</item>
+        <item>Aluno Graduação</item>
+        <item>Aluno Pós-Graduação</item>
+        <item>Aluno Doutorado</item>
+        <item>Aluno Mestrado</item>
+        <item>Técnico Administrativo</item>
+        <item>Docente</item>
+        <item>Outro</item>
+    </string-array>
+    <string name="title_activity_maps">Visualizar</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+</resources>

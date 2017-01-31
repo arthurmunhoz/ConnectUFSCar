@@ -1,0 +1,230 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:clickable="true"
+    android:configChanges="orientation|keyboardHidden"
+    android:background="#66f0f0f0">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Frenquenta quais locais?             Avalie-os aqui!"
+        android:id="@+id/tv_title"
+        android:textSize="22dp"
+        android:gravity="center_horizontal"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="true"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:textColor="#FF2B2B2B"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="15dp" />
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="br.ufscar.connect.EvaluationActivity"
+        android:id="@+id/relativeLayout2"
+        android:background="#66f0f0f0"
+        android:layout_below="@+id/tv_title">
+
+        //Icone e Spinner de selecao de espaco
+
+
+        //Texto e ratinBar de INFRAESTRUTURA
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/HOLDER_Scrollview">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="80dp"
+                android:id="@+id/btn_HOLDER"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/ratings_HOLDER">
+
+                <Button
+                    android:elegantTextHeight="false"
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:text="CONCLUIDO"
+                    android:id="@+id/btn_concluido"
+                    android:onClick="onButtonClick"
+                    android:textColor="#ff00c414"
+                    android:textSize="20dp"
+                    android:clickable="true"
+                    android:layout_gravity="right|bottom"
+                    android:typeface="normal"
+                    android:background="@layout/layout_btn_concluido"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratings_HOLDER"
+                android:layout_below="@+id/title_spinner_HOLDER"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INFRAESTRUTURA"
+                    android:id="@+id/tv_infra"
+                    android:layout_alignLeft="@+id/tv_acess"
+                    android:layout_alignStart="@+id/tv_acess"
+                    android:layout_marginTop="10dp" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:id="@+id/rb_infra"
+                    android:layout_below="@+id/tv_infra"
+                    android:numStars="5"
+                    android:rating="1.5"
+                    android:stepSize="0.5"
+                    android:theme="@style/RatingBar"
+                    android:layout_alignParentTop="false"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACESSIBILIDADE"
+                    android:id="@+id/tv_acess"
+                    android:layout_below="@+id/rb_infra"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:id="@+id/rb_acess"
+                    android:layout_below="@+id/tv_acess"
+                    android:layout_centerHorizontal="true"
+                    android:numStars="5"
+                    android:rating="1.5"
+                    android:theme="@style/RatingBar"
+                    android:stepSize="0.5"
+                    android:layout_alignParentTop="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LIMPEZA"
+                    android:id="@+id/tv_limp"
+                    android:layout_below="@+id/rb_acess"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:id="@+id/rb_limp"
+                    android:layout_below="@+id/tv_limp"
+                    android:layout_alignLeft="@+id/rb_acess"
+                    android:layout_alignStart="@+id/rb_acess"
+                    android:numStars="5"
+                    android:rating="1.5"
+                    android:theme="@style/RatingBar"
+                    android:stepSize="0.5" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SEGURANÇA"
+                    android:id="@+id/tv_seg"
+                    android:layout_below="@+id/rb_limp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:id="@+id/rb_seg"
+                    android:layout_below="@+id/tv_seg"
+                    android:numStars="5"
+                    android:rating="1.5"
+                    android:stepSize="0.5"
+                    android:theme="@style/RatingBar"
+                    android:layout_centerHorizontal="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GERAL"
+                    android:id="@+id/tv_geral"
+                    android:layout_below="@+id/rb_seg"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp" />
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:id="@+id/rb_geral"
+                    android:layout_below="@+id/tv_geral"
+                    android:layout_alignRight="@+id/rb_seg"
+                    android:layout_alignEnd="@+id/rb_seg"
+                    android:numStars="5"
+                    android:rating="1.5"
+                    android:theme="@style/RatingBar"
+                    android:stepSize="0.5"
+                    android:layout_marginBottom="10dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/title_spinner_HOLDER"
+                android:background="@drawable/btnfundo"
+                android:layout_below="@+id/tv_title"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/iv_espaco"
+                    android:background="@drawable/buildings1"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginStart="19dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true" />
+
+                <Spinner
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:id="@+id/spinnerEspaco"
+                    android:spinnerMode="dialog"
+                    android:entries="@array/lista_espacos"
+                    android:layout_marginLeft="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@+id/iv_espaco"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>
+

@@ -1,0 +1,129 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity"
+    android:id="@+id/layoutInicial"
+    android:background="#ffb2182d">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/et_username">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="220dp"
+            android:id="@+id/imageView"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/imglogin2"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="15dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/et_username"
+        android:gravity="center_vertical|bottom"
+        android:hint="Nome de usuário"
+        android:textColorHint="#ffdedede"
+        android:layout_above="@+id/et_password"
+        android:layout_marginBottom="10dp"
+        android:layout_alignEnd="@+id/btn_login"
+        android:layout_alignStart="@+id/et_password"
+        android:textSize="20dp"
+        android:typeface="normal"
+        android:maxLines="1"
+        android:lines="1"
+        android:enabled="true"
+        android:singleLine="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:editable="true"
+        android:selectAllOnFocus="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="ENTRAR"
+        android:id="@+id/btn_login"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="18dp"
+        android:textAlignment="center"
+        android:onClick="onButtonClick"
+        android:nestedScrollingEnabled="false"
+        android:enabled="true"
+        android:clickable="true"
+        android:background="#ffdedede"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_above="@+id/tv_forgotPass"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:id="@+id/tv_cadastrese"
+        android:textSize="14dp"
+        android:onClick="onButtonClick"
+        android:enabled="true"
+        android:clickable="true"
+        android:textColor="#ffe7e7e7"
+        android:alpha="0.75"
+        android:singleLine="true"
+        android:layout_alignParentBottom="true"
+        android:text="CRIAR NOVA CONTA NO CONNECT UFSCar"
+        android:layout_marginBottom="20dp"
+        android:layout_alignStart="@+id/btn_login"
+        android:layout_alignEnd="@+id/btn_login"
+        android:background="@layout/layout_btn_cadastrar"
+        android:gravity="center_vertical|center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Esqueceu sua senha?"
+        android:id="@+id/tv_forgotPass"
+        android:textSize="14dp"
+        android:enabled="true"
+        android:textColor="#ffe7e7e7"
+        android:textAlignment="gravity"
+        android:gravity="left|center"
+        android:paddingTop="5dp"
+        android:paddingLeft="2dp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/tv_cadastrese"
+        android:layout_marginBottom="30dp"
+        android:clickable="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/et_password"
+        android:password="true"
+        android:visibility="visible"
+        android:gravity="center_vertical|bottom"
+        android:hint="Senha"
+        android:textColorHint="#ffdedede"
+        android:layout_above="@+id/btn_login"
+        android:layout_marginBottom="15dp"
+        android:layout_alignEnd="@+id/btn_login"
+        android:layout_alignStart="@+id/btn_login"
+        android:maxLines="1"
+        android:lines="1"
+        android:enabled="true"
+        android:selectAllOnFocus="true" />
+
+
+</RelativeLayout>
