@@ -36,6 +36,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import java.util.Set;
 
 import br.ufscar.connect.Models.User;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import id.zelory.compressor.Compressor;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit.Callback;
 import retrofit.Response;
@@ -55,6 +57,7 @@ public class SignUpActivity extends Activity {
 
     //---------------------------------------------
     // Declarando variaveis
+    File imageFile;
     Spinner et_user_type, spinner; //spinner para selecao de curso
     User user = new User();
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
@@ -515,6 +518,12 @@ public class SignUpActivity extends Activity {
 
                     case SELECT_FILE:
 
+                        Bundle bundle = getIntent().getExtras();
+                        if (bundle != null) {// to avoid the NullPointerException
+                            cameraImage = (Bitmap) data.getExtras().get("data");
+                            Toast.makeText(getApplicationContext(), imageUri.toString(), Toast.LENGTH_LONG).show();
+                        }
+
                         imageUri = data.getData();
 
                         new upToCloud().execute();
@@ -594,7 +603,7 @@ public class SignUpActivity extends Activity {
             if (cameraImage != null) {
 
                 //Primeiro reduzimos o tamanho da imagem obtida da camera
-                cameraImageResized = getResizedBitmap(cameraImage, 500);
+                cameraImageResized = getResizedBitmap(cameraImage, 600);
                 //Depois, pegamos o 'path' dessa imagem Bitmap
                 imageUri = getImageUri(SignUpActivity.this, cameraImageResized);
                 //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
@@ -617,7 +626,15 @@ public class SignUpActivity extends Activity {
                 return null;
             } else {
 
-                //Pegamos os 'path' real da imagem Uri para passar ao CLoudinary
+                //Primeiro pegamos o path real da Uri da imagem
+                imagePath = getPath(imageUri);
+                //Depois, criamos um arquivo com o path da imagem
+                imageFile = new File(imagePath);
+                //Depois, utilizamos a biblioteca Compressor para comprimir uma imageFile para Bitmap
+                cameraImage = Compressor.getDefault(SignUpActivity.this).compressToBitmap(imageFile);
+                //Depois, pegamos o 'path' dessa imagem Bitmap
+                imageUri = getImageUri(SignUpActivity.this, cameraImage);
+                //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
                 imagePath = getPath(imageUri);
 
                 //Iniciando upload da imagem usando Couldinary

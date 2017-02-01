@@ -36,5 +36,7 @@ dependencies {
     compile 'jp.wasabeef:picasso-transformations:2.1.0'
     compile('com.andreabaccega:android-form-edittext:1.3.+')
     compile 'com.github.recoilme:malevich:4f896be8c2'
+    compile 'id.zelory:compressor:1.0.4'
+
 
 }
