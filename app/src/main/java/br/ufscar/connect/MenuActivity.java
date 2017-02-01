@@ -37,13 +37,14 @@ public class MenuActivity extends TabActivity {
         TabHost.TabSpec tabMapa = tabHost.newTabSpec("TabMapa");
         TabHost.TabSpec tabPerfil = tabHost.newTabSpec("TabPerfil");
 
-        //---------------
-        //Adicionando titulos nas TABS da tabHost
+        //--------------------------------------------------------------------------------
+        // Adicionando titulos nas TABS da tabHost
         // e definindo qual atividade realiza, nesse caso FEED, MAPA e PERFIL abrem
         // as respectivas activities, e + infla um menu que permite o usuario publicar
-        tabAdd.setIndicator("+");
-        tabAdd.setContent(new Intent(this, AddPublicationActivity.class));
 
+        tabAdd.setIndicator("+");
+        //tabAdd.setIndicator("", getResources().getDrawable(R.drawable.add));
+        tabAdd.setContent(new Intent(this, AddPublicationActivity.class));
 
         tabFeed.setIndicator("FEED");
         tabFeed.setContent(new Intent(this, FeedActivity.class));
@@ -55,7 +56,7 @@ public class MenuActivity extends TabActivity {
         tabPerfil.setIndicator("PERFIL");
         tabPerfil.setContent(new Intent(this, ProfileActivity.class));
 
-        //---------------
+        //--------------------------------------------------------------------------------
         //Adicionando as tabs criadas
         tabHost.addTab(tabFeed);
         tabHost.addTab(tabMapa);
@@ -78,11 +79,14 @@ public class MenuActivity extends TabActivity {
         //---------------
         //define o tamanho da fonte da tabHost
         final TabWidget tw = (TabWidget) tabHost.findViewById(android.R.id.tabs);
-        for (int i = 0; i < tw.getChildCount(); ++i) {
+        for (int i = 0; i < tw.getChildCount() - 1; ++i) {
             final View tabView = tw.getChildTabViewAt(i);
             final TextView tv = (TextView) tabView.findViewById(android.R.id.title);
             tv.setTextSize(15);
         }
+        final View tabView = tw.getChildAt(3);
+        final TextView tv = (TextView) tabView.findViewById(android.R.id.title);
+        tv.setTextSize(24);
 
     }
 

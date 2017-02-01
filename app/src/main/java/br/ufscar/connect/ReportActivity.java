@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +39,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -54,7 +56,7 @@ import retrofit.Retrofit;
 
 public class ReportActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    String USER_ID;
+    String USER_ID, PROBLEM_PHOTO;
 
     //DECLARANDO VARIAVEIS
     //estaticas
@@ -62,7 +64,8 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 1;
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 2;
     public static final int REQUEST_PERMISSION_SETTING = 3;
-    Bitmap cameraImage;
+
+    Bitmap cameraImage, cameraImageResized;
 
     private ImageView iv_foto;
     ImageButton btn_mycoordinates;
@@ -70,11 +73,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     Spinner et_category;
     EditText et_description;
 
-    String created_at;
-    String address;
-    String category;
-    String description;
-    String image_url, imageURL;
+    String imagePath, imageURL;
     Uri imageUri;
 
     GoogleApiClient mGoogleApiClient;
@@ -177,6 +176,35 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         //-------------------------------------------------------
         //Inicializando API
         api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        //Recebe os dados do usuario de USER_PREFERENCES
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+        PROBLEM_PHOTO = sharedPref.getString("problem_photo", "");
+
+        //Completa os objtos do XML com o conteudo adequado
+        assert PROBLEM_PHOTO != null;
+        //Toast.makeText(getApplicationContext(), USER_PHOTO, Toast.LENGTH_SHORT).show();
+        if (PROBLEM_PHOTO.contentEquals("")) {
+            //Do nothing
+        } else {
+            Picasso.Builder builder = new Picasso.Builder(this);
+            builder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+            builder.build().load(PROBLEM_PHOTO)
+                    .fit()
+                    .centerInside()
+                    .into(iv_foto);
+            iv_foto.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -377,9 +405,12 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
                         //Storage Permission already granted
-                        //Colocando e ajustando a imagem na UI
-                        iv_foto.setBackground(null);
-                        iv_foto.setVisibility(View.VISIBLE);
+                        //Imagem capturada salva na variavel imageUri(Uri)
+                        imageUri = data.getData();
+                        cameraImage = (Bitmap) data.getExtras().get("data");
+                        //Fazendo upload da imagem para Cloudinary
+                        new upToCloud().execute();
+
                         Picasso.Builder builder = new Picasso.Builder(this);
                         builder.listener(new Picasso.Listener() {
                             @Override
@@ -387,7 +418,11 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                                 exception.printStackTrace();
                             }
                         });
-                        builder.build().load(imageUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
+                        builder.build().load(imageUri)
+                                .fit()
+                                .centerInside()
+                                .into(iv_foto);
+                        iv_foto.setVisibility(View.VISIBLE);
 
 
                     } else {
@@ -450,7 +485,10 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                             exception.printStackTrace();
                         }
                     });
-                    builder.build().load(imageUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
+                    builder.build().load(imageUri)
+                            .fit()
+                            .centerInside()
+                            .into(iv_foto);
 
                 }
 
@@ -464,7 +502,11 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                         exception.printStackTrace();
                     }
                 });
-                builder.build().load(imageURL).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
+                builder.build().load(imageURL)
+                        .fit()
+                        .centerInside()
+                        .into(iv_foto);
+                iv_foto.setVisibility(View.VISIBLE);
 
             }
         }
@@ -491,7 +533,13 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         @Override
         protected Void doInBackground(Void... params) {
 
-            imageURL = getPath(imageUri);
+            //Primeiro reduzimos o tamanho da imagem obtida da camera
+            cameraImageResized = getResizedBitmap(cameraImage, 600);
+            //Depois, pegamos o 'path' dessa imagem Bitmap
+            imageUri = getImageUri(ReportActivity.this, cameraImageResized);
+            //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
+            imagePath = getPath(imageUri);
+
 
             //Iniciando upload da imagem usando Couldinary
             config = new HashMap();
@@ -501,7 +549,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             mobileCloudinary = new Cloudinary(config);
 
             try {
-                resultMap = mobileCloudinary.uploader().upload(imageURL, ObjectUtils.emptyMap());
+                resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -528,17 +576,50 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             if (asyncDialog.isShowing())
                 asyncDialog.dismiss();
 
+            //Salva os dados do usuario em SharedPreferences para uso em onResume()
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("problem_photo", imageURL).apply();
+
             super.onPostExecute(result);
         }
     }
 
 
+    //---------------------------------------------------------------------------------------------
+    // FUNCOES PARA MANIPULACAO DE IMAGENS   ------------------------------------------------------
+
+    //Retorna o 'path' da imagem Uri em String
     public String getPath(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = managedQuery(uri, projection, null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);
+    }
+
+    //Retorna o 'path' de uma imagem Bitmap em Uri
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    //Reduz o tamanho de uma imagem Bitmap
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
 

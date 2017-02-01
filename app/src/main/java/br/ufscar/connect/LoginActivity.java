@@ -1,9 +1,11 @@
 package br.ufscar.connect;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -77,54 +79,14 @@ public class LoginActivity extends Activity {
             if (password.length() == 0) {
 
                 et_password.setError("Digite sua senha!");
-                //Toast.makeText(c, "Nome de Usuário ou Senha inválidos.", Toast.LENGTH_LONG).show();
                 return;
             }
 
+            new upToDB().execute();
 
-            //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
-            // Prepare the HTTP request
-            api.login(username, password).enqueue(new Callback<User>() {
-
-                @Override
-                public void onResponse(Response<User> response, Retrofit retrofit) {
-                    //Se o servidor retornou com sucesso
-                    if (response.isSuccess()) {
-                        // Exibe mensagem de sucesso
-                        Toast.makeText(c, "BEM VINDO(A), " + response.body().getName() + "!", Toast.LENGTH_LONG).show();
-
-                        //Salva os dados do usuario em SharedPreferences para uso em outras activites
-                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("user_id", response.body().getUser_id()).apply();
-                        editor.putString("name", response.body().getName()).apply();
-                        editor.putString("lastname", response.body().getLast_name()).apply();
-                        editor.putString("email", response.body().getEmail()).apply();
-                        editor.putString("usertype", response.body().getUser_type()).apply();
-                        editor.putString("image_url", response.body().getUser_photo()).apply();
-                        editor.putString("username", response.body().getUsername()).apply();
-
-                        //-------------------------------------------------------------------------
-                        //Inicia o aplicativo
-                        Intent i = new Intent(LoginActivity.this, MenuActivity.class);
-                        startActivity(i);
-                        finish();
-                    } else {
-                        try {
-                            String error = response.errorBody().string();
-                            Toast.makeText(c, error, Toast.LENGTH_SHORT).show();
-                        } catch (IOException e) {
-                            Log.e("ERROR TAG", e.getMessage(), e);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    Log.e("ERROR_FAILURE", t.getMessage());
-                    Toast.makeText(c, t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
+            Intent i = new Intent(this, MenuActivity.class);
+            startActivity(i);
+            this.finish();
 
         }// end of btn_entrar click
 
@@ -157,5 +119,78 @@ public class LoginActivity extends Activity {
     public void onResume() {
         super.onResume();
 
+    }
+
+    private class upToDB extends AsyncTask<Void, Void, Void> {
+
+        ProgressDialog pd = new ProgressDialog(LoginActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+
+            //set message of the dialog
+            pd.setMessage("Entrando...");
+            pd.setCancelable(false);
+            pd.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            //hide the dialog
+            if (pd.isShowing())
+                pd.dismiss();
+
+            super.onPostExecute(result);
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
+
+            // Prepare the HTTP request
+            api.login(username, password).enqueue(new Callback<User>() {
+
+                @Override
+                public void onResponse(Response<User> response, Retrofit retrofit) {
+                    //Se o servidor retornou com sucesso
+                    if (response.isSuccess()) {
+                        // Exibe mensagem de sucesso
+                        Toast.makeText(c, "BEM VINDO(A), " + response.body().getName() + "!", Toast.LENGTH_LONG).show();
+
+                        //Salva os dados do usuario em SharedPreferences para uso em outras activites
+                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("user_id", response.body().getUser_id()).apply();
+                        editor.putString("name", response.body().getName()).apply();
+                        editor.putString("lastname", response.body().getLast_name()).apply();
+                        editor.putString("email", response.body().getEmail()).apply();
+                        editor.putString("usertype", response.body().getUser_type()).apply();
+                        editor.putString("image_url", response.body().getUser_photo()).apply();
+                        editor.putString("username", response.body().getUsername()).apply();
+
+                    } else {
+                        try {
+                            String error = response.errorBody().string();
+                            Toast.makeText(c, error, Toast.LENGTH_SHORT).show();
+                        } catch (IOException e) {
+                            Log.e("ERROR TAG", e.getMessage(), e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("ERROR_FAILURE", t.getMessage());
+                    Toast.makeText(c, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            return null;
+        }
     }
 }

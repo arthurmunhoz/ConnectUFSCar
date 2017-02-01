@@ -233,8 +233,8 @@
         </RelativeLayout>
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
             android:id="@+id/iv_profile_picture"
             android:layout_below="@+id/tv_title"
             android:layout_centerHorizontal="true"

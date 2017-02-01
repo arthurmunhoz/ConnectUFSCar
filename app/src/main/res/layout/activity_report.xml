@@ -1,242 +1,256 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ScrollView01"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:clickable="true"
+    android:background="#66d3d3d3">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    <Button
+        android:elegantTextHeight="false"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="CONCLUIDO"
+        android:id="@+id/btn_concluido"
+        android:onClick="onButtonClick"
+        android:textColor="#ff00c414"
+        android:textSize="20dp"
+        android:clickable="true"
+        android:layout_gravity="right|bottom"
+        android:typeface="normal"
+        android:background="@layout/layout_btn_concluido"
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentStart="false"
+        android:enabled="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/btn_tirarfoto"
+        android:layout_toStartOf="@+id/btn_tirarfoto"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentBottom="true"
+        android:maxHeight="50dp" />
+
+    <Button
+        android:layout_width="35dp"
+        android:layout_height="40dp"
+        android:id="@+id/btn_tirarfoto"
+        android:background="@drawable/photocamera"
+        android:layout_gravity="bottom|center_horizontal"
+        android:clickable="true"
+        android:onClick="onButtonClick"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/btn_concluido"
+        android:layout_alignBottom="@+id/btn_concluido"
+        android:layout_marginTop="7dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="7dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="br.ufscar.connect.ReportActivity"
-        android:id="@+id/relativeLayout1"
-        android:configChanges="orientation|keyboardHidden"
-        android:background="#66d3d3d3">
+        android:layout_above="@+id/btn_concluido">
 
-        <RelativeLayout
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/legenda_HOLDER"
-            android:layout_alignParentTop="true">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sabe de algum problema pela UFSCar? Nos conte qual, não esqueça da foto!"
-                android:id="@+id/tv_legenda2"
-                android:layout_marginTop="20dp"
-                android:gravity="center_horizontal"
-                android:textSize="22dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:textColor="#FF2B2B2B"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/spinner_HOLDER"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="false"
-            android:layout_below="@id/legenda_HOLDER"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/btnfundo">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/iv_iconecategoria"
-                android:background="@drawable/helpwebbutton"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="10dp" />
-
-            <Spinner
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/spinnerCategoria"
-                android:spinnerMode="dialog"
-                android:entries="@array/lista_categorias"
-                android:layout_toRightOf="@+id/iv_iconecategoria"
-                android:layout_marginLeft="10dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp" />
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:id="@+id/photo_HOLDER"
-            android:layout_below="@+id/info_HOLDER"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="5dp">
-
-            <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/iv_foto"
-                android:layout_gravity="center_horizontal"
-                android:visibility="invisible"
-                android:layout_alignParentStart="true"
-                android:layout_alignTop="@+id/btn_tirarfoto"
-                android:layout_above="@+id/btn_concluido"
-                android:layout_marginBottom="5dp" />
-
-            <Button
-                android:elegantTextHeight="false"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:text="CONCLUIDO"
-                android:id="@+id/btn_concluido"
-                android:layout_alignParentBottom="true"
-                android:onClick="onButtonClick"
-                android:textColor="#ff00c414"
-                android:textSize="20dp"
-                android:clickable="true"
-                android:width="150dp"
-                android:layout_gravity="right|bottom"
-                android:typeface="normal"
-                android:background="@layout/layout_btn_concluido"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="12dp"
-                android:layout_marginBottom="8dp"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/relativeLayout" />
+            tools:context="br.ufscar.connect.ReportActivity"
+            android:id="@+id/relativeLayout1"
+            android:configChanges="orientation|keyboardHidden"
+            android:background="#66d3d3d3"
+            android:clickable="true">
 
             <RelativeLayout
-                android:layout_width="50dp"
-                android:layout_height="45dp"
-                android:background="@drawable/btnfundosquare"
-                android:layout_alignTop="@+id/btn_concluido"
-                android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@+id/btn_concluido"
-                android:id="@+id/relativeLayout"
-                android:layout_marginRight="15dp"
-                android:layout_marginLeft="5dp">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/legenda_HOLDER"
+                android:layout_alignParentTop="true"
+                android:clickable="true">
 
-                <Button
-                    android:layout_width="35dp"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sabe de algum problema pela UFSCar? Nos conte qual, não esqueça da foto!"
+                    android:id="@+id/tv_legenda2"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_horizontal"
+                    android:textSize="22dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:textColor="#FF2B2B2B"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"></RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/spinner_HOLDER"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentRight="false"
+                android:layout_below="@id/legenda_HOLDER"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/btnfundo"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:id="@+id/iv_iconecategoria"
+                    android:background="@drawable/helpwebbutton"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="10dp" />
+
+                <Spinner
+                    android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:id="@+id/btn_tirarfoto"
-                    android:background="@drawable/photocamera"
-                    android:layout_gravity="bottom|center_horizontal"
+                    android:id="@+id/spinnerCategoria"
+                    android:spinnerMode="dialog"
+                    android:entries="@array/lista_categorias"
+                    android:layout_toRightOf="@+id/iv_iconecategoria"
+                    android:layout_marginLeft="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp" />
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/photo_HOLDER"
+                android:clickable="true"
+                android:layout_below="@+id/info_HOLDER"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="5dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:layout_width="fill_parent"
+                    android:layout_height="250dp"
+                    android:id="@+id/iv_foto"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="invisible"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginBottom="5dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/description_HOLDER"
+                android:layout_below="@+id/spinner_HOLDER"
+                android:layout_marginTop="15dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:clickable="true">
+
+                <LinearLayout
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:layout_width="0px"
+                    android:layout_height="0px" />
+
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="80dp"
+                    android:id="@+id/et_descricaoproblema"
+                    android:hint="Descreva o problema..."
+                    android:typeface="normal"
+                    android:maxLines="3"
+                    android:textSize="18dp"
+                    android:enabled="true"
+                    android:gravity="center"
+                    android:inputType="textShortMessage|textMultiLine"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:background="#FFFFFF"
+                    android:editable="true"
+                    android:clickable="true" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/info_HOLDER"
+                android:layout_below="@+id/description_HOLDER"
+                android:clickable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="ou"
+                    android:id="@+id/textView"
+                    android:gravity="bottom"
+                    android:layout_alignBottom="@+id/et_address"
+                    android:layout_toLeftOf="@+id/btn_mycoordinates"
+                    android:layout_toStartOf="@+id/btn_mycoordinates"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="5dp" />
+
+                <EditText
+                    android:layout_width="fill_parent"
+                    android:layout_height="60dp"
+                    android:id="@+id/et_address"
+                    android:hint="Digite o endereço"
+                    android:typeface="normal"
+                    android:maxLines="2"
+                    android:textSize="18dp"
+                    android:enabled="true"
+                    android:gravity="bottom"
+                    android:inputType="textShortMessage|textMultiLine"
+                    android:paddingTop="10dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="5dp"
+                    android:selectAllOnFocus="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_toLeftOf="@+id/textView"
+                    android:layout_toStartOf="@+id/textView"
+                    android:layout_marginRight="5dp" />
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/btn_mycoordinates"
+                    android:background="@android:drawable/ic_menu_mylocation"
                     android:clickable="true"
                     android:onClick="onButtonClick"
-                    android:layout_above="@+id/btn_concluido"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_margin="12dp" />
+                    android:layout_marginRight="15dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignBottom="@+id/textView"
+                    android:layout_marginLeft="5dp" />
+
             </RelativeLayout>
 
         </RelativeLayout>
+    </ScrollView>
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/description_HOLDER"
-            android:layout_below="@+id/spinner_HOLDER"
-            android:layout_marginTop="15dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
-
-            <LinearLayout
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="0px"
-                android:layout_height="0px" />
-
-            <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="80dp"
-                android:id="@+id/et_descricaoproblema"
-                android:hint="Descreva o problema..."
-                android:typeface="normal"
-                android:maxLines="3"
-                android:textSize="18dp"
-                android:enabled="true"
-                android:gravity="center"
-                android:inputType="textShortMessage|textMultiLine"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:background="#FFFFFF"
-                android:editable="true"
-                android:clickable="true" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/info_HOLDER"
-            android:layout_below="@+id/description_HOLDER">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="ou"
-                android:id="@+id/textView"
-                android:gravity="bottom"
-                android:layout_alignBottom="@+id/et_address"
-                android:layout_toLeftOf="@+id/btn_mycoordinates"
-                android:layout_toStartOf="@+id/btn_mycoordinates"
-                android:layout_marginRight="0dp"
-                android:layout_marginBottom="5dp" />
-
-            <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="60dp"
-                android:id="@+id/et_address"
-                android:hint="Endereço"
-                android:typeface="normal"
-                android:maxLines="2"
-                android:textSize="18dp"
-                android:enabled="true"
-                android:gravity="bottom"
-                android:inputType="textShortMessage|textMultiLine"
-                android:paddingTop="10dp"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="5dp"
-                android:selectAllOnFocus="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="15dp"
-                android:layout_toLeftOf="@+id/textView"
-                android:layout_toStartOf="@+id/textView"
-                android:layout_marginRight="5dp" />
-
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/btn_mycoordinates"
-                android:background="@android:drawable/ic_menu_mylocation"
-                android:clickable="true"
-                android:onClick="onButtonClick"
-                android:layout_marginRight="15dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@+id/textView"
-                android:layout_marginLeft="5dp" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-</ScrollView>
+</RelativeLayout>

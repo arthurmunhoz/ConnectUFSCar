@@ -34,12 +34,14 @@ public class AddPublicationActivity extends Activity {
         if (v.getId() == R.id.btn_reportar) {
 
             startActivity(new Intent(this, ReportActivity.class));
+            finish();
         }
 
         //Se o usuario clicar no botao AVALIAR ESPACO, o app redireciona para a tela EvaluationActivity
         if (v.getId() == R.id.btn_avaliar) {
 
             startActivity(new Intent(this, EvaluationActivity.class));
+            finish();
         }
 
     }

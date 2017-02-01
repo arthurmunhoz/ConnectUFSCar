@@ -65,14 +65,14 @@
                 android:id="@+id/imageView2"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="19dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="50dp"
                 android:background="@drawable/thumbsupcircular2" />
 
         </RelativeLayout>
 
         <Button
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:id="@+id/btn_reportar"
             android:clickable="true"
             android:onClick="onButtonClick"
@@ -87,11 +87,11 @@
             android:typeface="normal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="30dp" />
+            android:layout_marginBottom="15dp" />
 
         <Button
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:id="@+id/btn_avaliar"
             android:clickable="true"
             android:focusable="false"
@@ -107,7 +107,7 @@
             android:textSize="20dp"
             android:layout_above="@+id/btn_reportar"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="20dp"
             android:typeface="normal"
             android:layout_marginTop="10dp" />
 

@@ -76,11 +76,10 @@ public class EvaluationActivity extends Activity {
                 return;
             }
 
-            Toast.makeText(getApplicationContext(), "Avaliação realizada com sucesso", Toast.LENGTH_LONG).show();
-            Intent i = new Intent(getApplicationContext(), AddPublicationActivity.class);
+            Toast.makeText(getApplicationContext(), "Avaliação realizada com sucesso!", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(getApplicationContext(), MenuActivity.class);
             startActivity(i);
-            this.finish();
-
+            finish();
         }
     }
 
