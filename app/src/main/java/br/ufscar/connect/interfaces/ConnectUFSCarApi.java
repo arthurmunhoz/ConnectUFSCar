@@ -8,6 +8,7 @@ import br.ufscar.connect.Models.User;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
+import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
@@ -38,30 +39,23 @@ public interface ConnectUFSCarApi {
     Call<User> login(@Field("username") String username, @Field("password") String password);
 
     //USUARIOS - CREATE : POST
-    @FormUrlEncoded
     @POST("users/create")
-    Call<User> usersCreate(@Field("usertype") String user_type, @Field("username") String username,
-                           @Field("name") String name, @Field("lastname") String last_name, @Field("email") String email,
-                           @Field("password") String password, @Field("image_url") String image_url);
+    Call<User> usersCreate(@Body User user);
 
     //USUARIOS - UPDATE : PUT
     @FormUrlEncoded
     @PUT("users/update")
     Call<User> usersUpdate(@Field("usertype") String user_type, @Field("username") String username,
                            @Field("name") String name, @Field("lastname") String last_name, @Field("email") String email,
-                           @Field("password") String password, @Field("image_url") String imagem_url);
+                           @Field("password") String password, @Field("image_url") String image_url);
 
     //DENUNCIAS - CREATE : POST
-    @FormUrlEncoded
     @POST("reports/create")
-    Call<Report> reportCreate(@Field("address") String address, @Field("category") String category, @Field("description") String description,
-                              @Field("user_id") String USER_ID, @Field("image_url") String imagem_url, @Field("created_at") String craeted_at);
+    Call<Report> reportCreate(@Body Report report);
 
     //AVALIACOES - CREATE : POST
-    @FormUrlEncoded
     @POST("evaluation/create")
-    Call<Report> evaluationCreate(@Field("placename") String placename, @Field("infra") Float infra, @Field("limp") Float limp, @Field("geral") Float geral,
-                                  @Field("seg") Float seg, @Field("acess") Float acess, @Field("user_id") String USER_ID, @Field("created_at") String craeted_at);
+    Call<Report> evaluationCreate(@Body Evaluation evaluation);
 
     //LISTAR DENUNCIAS : GET
     @GET("reports")

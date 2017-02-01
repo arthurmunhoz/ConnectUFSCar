@@ -3,6 +3,7 @@ package br.ufscar.connect;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,9 +54,10 @@ public class SignUpActivity extends Activity {
 
     //---------------------------------------------
     //Declarando variaveis
-    String imagePath;
+    String imageURL, imagePath;
     Spinner et_user_type;
     Spinner spinner; //spinner para selecao de curso
+    User user = new User();
 
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 1;
 
@@ -179,6 +181,7 @@ public class SignUpActivity extends Activity {
         et_password_conf = (EditText) findViewById(R.id.et_password_conf);
 
         iv_profile_pic = (ImageView) findViewById(R.id.iv_profile_picture);
+        iv_profile_pic.setImageResource(R.drawable.usericon2);
 
     }
 
@@ -213,51 +216,46 @@ public class SignUpActivity extends Activity {
             });
             builder.show();
 
-
+            return;
         }
 
         //Se o usuario clicar no botao CONCLUIDO, exibe-se uma mensagem e retorna para a activity LoginActivity
         if (v.getId() == R.id.btn_concluido) {
 
-            //recebendo texto inserido pelo usuario nos campos xml
-            user_type = et_user_type.getSelectedItem().toString();
-            username = et_username.getText() + "";
-            last_name = et_last_name.getText() + "";
-            name = et_name.getText() + "";
-            email = et_email.getText() + "";
-            password = et_password.getText() + "";
+            //Recebendo texto inserido pelo usuario nos campos xml
+            user.setUser_type(et_user_type.getSelectedItem().toString());
+            user.setUsername(et_username.getText() + "");
+            user.setLast_name(et_last_name.getText() + "");
+            user.setName(et_name.getText() + "");
+            user.setEmail(et_email.getText() + "");
+            user.setPassword(et_password.getText() + "");
             password_conf = et_password_conf.getText() + "";
-            image_url = imagePath;
-
-            //Salva os dados do usuario em SharedPreferences para uso em outras activites
-            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("image_url", imagePath).apply();
+            user.setUser_photo(imageURL);
 
             //-------------------- VERIFICACOES DE ERROS ----------------------
 
             //Se o usuario nao digitar nada em em algum dos campos, recebe uma mensagem de erro
-            if (username.length() == 0) {
+            if (user.getUsername().length() == 0) {
                 et_username.setError("Digite um Nome de Usuário");
                 return;
             }
-            if (name.length() == 0) {
+            if (user.getName().length() == 0) {
                 et_name.setError("Digite seu nome");
                 return;
             }
-            if (last_name.length() == 0) {
+            if (user.getLast_name().length() == 0) {
                 et_last_name.setError("Digite seu sobrenome");
                 return;
             }
-            if (password.length() == 0) {
+            if (user.getPassword().length() == 0) {
                 et_password.setError("Digite uma senha");
                 return;
             }
-            if (email.length() == 0) {
+            if (user.getEmail().length() == 0) {
                 et_email.setError("Digite seu e-mail");
                 return;
             }
-            if (password_conf.length() == 0) {
+            if (et_password_conf.getText().length() == 0) {
                 et_password_conf.setError("Confirme sua senha");
                 return;
             }
@@ -270,17 +268,20 @@ public class SignUpActivity extends Activity {
             }
 
             //Se Senha e a confirmacao de senha nao forem iguais, exibe mensagem ao usuario
-            if (password_conf.equals(password) == false) {
+            if (password_conf.equals(user.getPassword()) == false) {
                 Toast.makeText(getApplicationContext(), "SENHA e CONFIRMAÇÃO DE SENHA não conferem, por favor verifique.", Toast.LENGTH_LONG).show();
                 return;
             }
+            // end of VERIFICACAO DE ERROS
 
-
-        }// end of VERIFICACAO DE ERROS
+            //Salva os dados do usuario em SharedPreferences para uso em outras activites
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("image_url", imageURL).apply();
 
         //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
         // Prepare the HTTP request
-        api.usersCreate(user_type, username, name, last_name, email, password, image_url).enqueue(new Callback<User>() {
+            api.usersCreate(user).enqueue(new Callback<User>() {
 
             @Override
             public void onResponse(Response<User> response, Retrofit retrofit) {
@@ -311,10 +312,10 @@ public class SignUpActivity extends Activity {
             @Override
             public void onFailure(Throwable t) {
                 Log.e("ERROR_FAILURE", t.getMessage());
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "FAILURE: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-
+    }
     }
 
 
@@ -346,25 +347,6 @@ public class SignUpActivity extends Activity {
         finish();
     }
 
-    // Save the activity state when it's going to stop.
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable("cameraImage", cameraImage);
-        outState.putParcelable("imageUri", imageUri);
-    }
-
-    // Recover the saved state when the activity is recreated.
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        cameraImage = savedInstanceState.getParcelable("cameraImage");
-        imageUri = savedInstanceState.getParcelable("imageUri");
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -383,21 +365,12 @@ public class SignUpActivity extends Activity {
                         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                                //Storage Permission already granted
-                                //Colocando e ajustando a imagem na UI
-                                iv_profile_pic.setBackground(null);
-                                iv_profile_pic.setVisibility(View.VISIBLE);
-                                Picasso.Builder builder = new Picasso.Builder(this);
-                                builder.listener(new Picasso.Listener() {
-                                    @Override
-                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                        exception.printStackTrace();
-                                    }
-                                });
-                                builder.build().load(imageUri)
-                                        .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                                        .transform(new CropCircleTransformation()).into(iv_profile_pic);
+                                //Storage Permission already granted, do what we need
 
+                                //Imagem capturada salva na variavel imageUri(Uri)
+                                imageUri = data.getData();
+                                //Fazendo upload da imagem para Cloudinary
+                                new upToCloud().execute();
 
                             } else {
 
@@ -462,23 +435,7 @@ public class SignUpActivity extends Activity {
                                     .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
                                     .transform(new CropCircleTransformation())
                                     .into(iv_profile_pic);
-
                         }
-
-                        //Imagem capturada salva na variavel cameraImage (bitmap)
-                        //cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraImage
-                        imageUri = data.getData();
-
-                        //Convertendo cameraImage em um InputStream
-                        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        //cameraImage.compress(Bitmap.CompressFormat.JPEG, 0, stream);
-                        //InputStream is = new ByteArrayInputStream(stream.toByteArray());
-
-                        new upToCloud().execute();
-
-                        imagePath = (String) resultMap.get("image_url"); //pegando a url da imagem do retorno do upToCloud
-                        Toast.makeText(getApplicationContext(), imagePath, Toast.LENGTH_LONG).show();
-
 
                     case SELECT_FILE:
 
@@ -486,16 +443,20 @@ public class SignUpActivity extends Activity {
 
                         new upToCloud().execute();
 
-                        image_url = (String) resultMap.get("image_url");
-
-                        iv_profile_pic.setBackground(null);
+                        //Colocando e ajustando a imagem na UI
                         iv_profile_pic.setVisibility(View.VISIBLE);
-                        Picasso.with(this).load(imageUri)
-                                .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                                .transform(new CropCircleTransformation())
-                                .into(iv_profile_pic);
 
-                }//end of SELECT_FILE
+                        Picasso.Builder builder = new Picasso.Builder(SignUpActivity.this);
+                        builder.listener(new Picasso.Listener() {
+                            @Override
+                            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                                exception.printStackTrace();
+                            }
+                        });
+
+                        builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+
+                }//end of switch
             }
         }
     }
@@ -505,22 +466,50 @@ public class SignUpActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        if (imageUri != null)
+        if (imageUri != null) {
 
             //Colocando e ajustando a imagem na UI
             iv_profile_pic.setVisibility(View.VISIBLE);
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.listener(new Picasso.Listener() {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                exception.printStackTrace();
-            }
-        });
-        builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+
+            Picasso.Builder builder = new Picasso.Builder(this);
+            builder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+
+            builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+        }
+
     }
 
     //Envia as fotos no formato Uri para o servidor Cloudinary
     private class upToCloud extends AsyncTask<Void, Void, Void> {
+
+        ProgressDialog asyncDialog = new ProgressDialog(SignUpActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            //set message of the dialog
+            asyncDialog.setMessage("Carregando imagem...");
+            asyncDialog.setCancelable(false);
+            asyncDialog.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            imageURL = (String) resultMap.get("url");
+
+            //hide the dialog
+            if (asyncDialog.isShowing())
+                asyncDialog.dismiss();
+
+            super.onPostExecute(result);
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -543,6 +532,7 @@ public class SignUpActivity extends Activity {
             return null;
         }
     }
+
 
     public String getPath(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};

@@ -4,8 +4,6 @@ import android.app.Application;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 /**
  * Created by Arthur on 06/12/2016.
  */
@@ -23,7 +21,7 @@ public class Report extends Application {
     @SerializedName("user_id")
     private String user_id;
     @SerializedName("created_at")
-    private Date date;
+    private String date;
 
 
     //Metodos
@@ -36,7 +34,7 @@ public class Report extends Application {
     }
 
     public Report(String problemPhoto, String problemAddress, String problemDescription,
-                  String problemCategory, Date date, String user_id) {
+                  String problemCategory, String date, String user_id) {
         this.problemPhoto = problemPhoto;
         this.problemAddress = problemAddress;
         this.problemDescription = problemDescription;
@@ -80,11 +78,11 @@ public class Report extends Application {
         this.problemCategory = problemCategory;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

@@ -7,14 +7,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -35,15 +37,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.security.Timestamp;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import br.ufscar.connect.Models.Report;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -70,26 +69,86 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     Spinner et_category;
     EditText et_description;
 
-    Timestamp ts;
     String created_at;
     String address;
     String category;
     String description;
-    String image_url;
-    Uri picUri;
+    String image_url, imageURL;
+    Uri imageUri;
 
     GoogleApiClient mGoogleApiClient;
     ConnectUFSCarApi api;
+    Cloudinary mobileCloudinary;
+
+    Map resultMap = new Map() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean containsKey(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsValue(Object o) {
+            return false;
+        }
+
+        @Override
+        public Object get(Object o) {
+            return null;
+        }
+
+        @Override
+        public Object put(Object o, Object o2) {
+            return null;
+        }
+
+        @Override
+        public Object remove(Object o) {
+            return null;
+        }
+
+        @Override
+        public void putAll(Map map) {
+
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @NonNull
+        @Override
+        public Set keySet() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Collection values() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Set<Entry> entrySet() {
+            return null;
+        }
+    }, config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
 
         //-------------------------------------------------------
         //Initializing fragments from the XML
@@ -145,17 +204,20 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         //Se o usuario clicar no botao CONCLUIDO, exibe-se uma mensagem e retorna para a activity MenuActivity(que redireciona o usuario para FeedActivity)
         if (v.getId() == R.id.btn_concluido) {
 
-            Intent i = new Intent(this, MenuActivity.class);
-
             //Recebendo informacoes e textos digitados pelo usuario
-            address = et_address.getText() + "";
-            int position = et_category.getSelectedItemPosition(); //recebe a posiçao do item selecionado no spinner (int)
-            category = et_category.getItemAtPosition(position).toString(); //recebe o item selecionado (string)
-            description = et_description.getText() + "";
-            image_url = "";
-            Date date = new Date(System.currentTimeMillis());
-            created_at = date.toString();
+            Report report = new Report();
 
+            report.setProblemAddress(et_address.getText() + "");
+
+            int position = et_category.getSelectedItemPosition(); //recebe a posiçao do item selecionado no spinner (int)
+            report.setProblemCategory(et_category.getItemAtPosition(position).toString()); //recebe o item selecionado (string)
+
+            report.setProblemDescription(et_description.getText() + "");
+
+            report.setProblemPhoto(imageURL);
+
+            String date = new Date(System.currentTimeMillis()).toString();
+            report.setDate(date);
 
             //Recebe os dados do usuario de USER_PREFERENCES
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
@@ -185,7 +247,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
             //-------------------------------------------------------------------------------------
             //Enviando textos ao servidor utilizando Retrofit
-            api.reportCreate(address, category, description, USER_ID, image_url, created_at).enqueue(new Callback<Report>() {
+            api.reportCreate(report).enqueue(new Callback<Report>() {
 
                 @Override
                 public void onResponse(Response<Report> response, Retrofit retrofit) {
@@ -194,21 +256,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "DENÚNCIA REALIZADA COM SUCESSO", Toast.LENGTH_LONG).show();
-
-                        //-------------------------------------------------------------------------------------
-                        //Enviando a foto tirada ao servidor Cloudinary
-                        Map config = new HashMap();
-                        config.put("cloud_name", "cloud-connectufscar");
-                        config.put("api_key", "726282638648912");
-                        config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
-                        Cloudinary mobileCloudinary = new Cloudinary(config);
-
-                        try {
-                            Map resultMap = mobileCloudinary.uploader().upload(response.body().getProblemPhoto(), ObjectUtils.emptyMap());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
 
                         //Volta a tela de Feed
                         Intent i = new Intent(ReportActivity.this, MenuActivity.class);
@@ -292,7 +339,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
-
         }
 
     }
@@ -330,12 +376,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                 //Imagem capturada salva na variavel cameraImage (bitmap)
                 cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraImage
-                picUri = data.getData();
-
-                //Convertendo cameraImage em um InputStream
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                cameraImage.compress(Bitmap.CompressFormat.JPEG, 0, stream);
-                InputStream is = new ByteArrayInputStream(stream.toByteArray());
+                imageUri = data.getData();
 
                 //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -344,7 +385,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                         //Storage Permission already granted
                         //Colocando e ajustando a imagem na UI
                         iv_foto.setBackground(null);
-                        //iv_profile_pic.setImageBitmap(cameraImage);
                         iv_foto.setVisibility(View.VISIBLE);
                         Picasso.Builder builder = new Picasso.Builder(this);
                         builder.listener(new Picasso.Listener() {
@@ -353,7 +393,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                                 exception.printStackTrace();
                             }
                         });
-                        builder.build().load(picUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
+                        builder.build().load(imageUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
 
 
                     } else {
@@ -416,23 +456,19 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                             exception.printStackTrace();
                         }
                     });
-                    builder.build().load(picUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
+                    builder.build().load(imageUri).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
 
                 }
+
+                //Enviando a foto para o servidor Cloudinary e salvando o URL na variavel imageURL para salvar no BD
+                new upToCloud().execute();
+                imageURL = (String) resultMap.get("url"); //pegando a url da imagem do retorno do upToCloud
 
             }
         }
 
     }
 
-    //Transforma a imagem capturada pela câmera(bitmap) em um InpputStream para ser enviado
-    //ao servido Cloudinary
-    public static InputStream bitmapToInputStream(Bitmap bitmap) {
-        int size = bitmap.getHeight() * bitmap.getRowBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-        bitmap.copyPixelsToBuffer(buffer);
-        return new ByteArrayInputStream(buffer.array());
-    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -443,6 +479,40 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     public void onBackPressed() {
         //Display alert message when back button has been pressed
         finish();
+    }
+
+    //Envia as fotos no formato Uri para o servidor Cloudinary
+    private class upToCloud extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            imageURL = new String(getPath(imageUri));
+
+            //Iniciando upload da imagem usando Couldinary
+            config = new HashMap();
+            config.put("cloud_name", "cloud-connectufscar");
+            config.put("api_key", "726282638648912");
+            config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+            mobileCloudinary = new Cloudinary(config);
+
+            try {
+                resultMap = mobileCloudinary.uploader().upload(imageURL, ObjectUtils.emptyMap());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+    }
+
+
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
 

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.security.Timestamp;
 import java.util.Date;
 
+import br.ufscar.connect.Models.Evaluation;
 import br.ufscar.connect.Models.Report;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import retrofit.Callback;
@@ -51,12 +51,6 @@ public class EvaluationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluation);
 
-        //Essas linhas permitem que o Cloudinary conecte na thread principal
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-
         //-------------------------------------------------------
         //Inicializando API
         api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
@@ -83,22 +77,24 @@ public class EvaluationActivity extends Activity {
 
             //------------------------------------------------
             //Pegando notas das categorias e local
-            String placename = spinner_espacos.getSelectedItem().toString() + "";
-            Float infra = notaInfra.getRating();
-            Float acess = notaAcess.getRating();
-            Float limp = notaLimp.getRating();
-            Float seg = notaSeg.getRating();
-            Float geral = notaGeral.getRating();
+            Evaluation evaluation = new Evaluation();
+            evaluation.setEspaco(spinner_espacos.getSelectedItem().toString() + "");
+            evaluation.setInfra(notaInfra.getRating());
+            evaluation.setAcess(notaAcess.getRating());
+            evaluation.setLimp(notaLimp.getRating());
+            evaluation.setSeg(notaSeg.getRating());
+            evaluation.setGeral(notaGeral.getRating());
             Date date = new Date(System.currentTimeMillis());
-            created_at = date.toString();
+            evaluation.setDate(date.toString());
 
 
             //Recebe os dados do usuario de USER_PREFERENCES
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
             USER_ID = sharedPref.getString("user_id", "");
+
             //-------------------------------------------------------------------------------------
-            //Enviando infos ao servidor utilizando Retrofit
-            api.evaluationCreate(placename, infra, acess, limp, seg, geral, USER_ID, created_at).enqueue(new Callback<Report>() {
+            //Enviando infos ao BD atraves das chamadas definidas na interface ConnectUFSCarApi
+            api.evaluationCreate(evaluation).enqueue(new Callback<Report>() {
 
                 @Override
                 public void onResponse(Response<Report> response, Retrofit retrofit) {

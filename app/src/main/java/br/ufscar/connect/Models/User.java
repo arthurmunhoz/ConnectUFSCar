@@ -20,6 +20,10 @@ public class User {
     @SerializedName("_id")
     private String user_id;
 
+
+    public User() {
+    }
+
     public String getUser_type() {
         return user_type;
     }

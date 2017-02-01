@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -77,7 +77,7 @@ public class ProfileActivity extends Activity {
         if (USER_PHOTO.contentEquals("")) {
             iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
         } else {
-            Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(iv_profile_pic);
+            Picasso.with(context).load(USER_PHOTO).into(iv_profile_pic);
         }
 
         tv_name.setText(USER_NAME + " " + USER_LASTNAME); //completa o TextView com o nome COMPLETO do usuario
@@ -102,6 +102,7 @@ public class ProfileActivity extends Activity {
         USER_USERNAME = sharedPref.getString("username", "");
         USER_TYPE = sharedPref.getString("usertype", "");
         USER_PHOTO = sharedPref.getString("image_url", "");
+        Toast.makeText(getApplicationContext(), USER_PHOTO, Toast.LENGTH_LONG).show();
 
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
@@ -110,7 +111,9 @@ public class ProfileActivity extends Activity {
             iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
         } else {
             iv_profile_pic.setBackground(null);
-            Picasso.with(this).load(Uri.parse(USER_PHOTO)).into(iv_profile_pic);
+            Picasso.with(this).load(USER_PHOTO)
+                    .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                    .into(iv_profile_pic);
         }
 
         tv_name.setText(USER_NAME + " " + USER_LASTNAME); //completa o TextView com o nome COMPLETO do usuario

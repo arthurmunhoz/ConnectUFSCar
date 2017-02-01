@@ -4,8 +4,6 @@ import android.app.Application;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 /**
  * Created by Arthur on 06/12/2016.
  */
@@ -25,7 +23,7 @@ public class Evaluation extends Application {
     @SerializedName("placename")
     private String espaco;
     @SerializedName("created_at")
-    private Date date;
+    private String date;
 
     //Construtor
     public void Evaluation(float infra, float limp, float acess, float seg, float geral) {
@@ -37,11 +35,11 @@ public class Evaluation extends Application {
         this.Geral = geral;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
