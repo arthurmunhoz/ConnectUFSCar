@@ -99,7 +99,6 @@
                     android:numStars="5"
                     android:rating="1.5"
                     android:stepSize="0.5"
-                    android:theme="@style/RatingBar"
                     android:layout_alignParentTop="false"
                     android:layout_centerHorizontal="true" />
 
@@ -120,7 +119,6 @@
                     android:layout_centerHorizontal="true"
                     android:numStars="5"
                     android:rating="1.5"
-                    android:theme="@style/RatingBar"
                     android:stepSize="0.5"
                     android:layout_alignParentTop="false" />
 
@@ -142,7 +140,6 @@
                     android:layout_alignStart="@+id/rb_acess"
                     android:numStars="5"
                     android:rating="1.5"
-                    android:theme="@style/RatingBar"
                     android:stepSize="0.5" />
 
                 <TextView
@@ -162,7 +159,6 @@
                     android:numStars="5"
                     android:rating="1.5"
                     android:stepSize="0.5"
-                    android:theme="@style/RatingBar"
                     android:layout_centerHorizontal="true" />
 
                 <TextView
@@ -183,7 +179,6 @@
                     android:layout_alignEnd="@+id/rb_seg"
                     android:numStars="5"
                     android:rating="1.5"
-                    android:theme="@style/RatingBar"
                     android:stepSize="0.5"
                     android:layout_marginBottom="10dp" />
 
@@ -221,7 +216,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_toEndOf="@+id/iv_espaco"
                     android:layout_alignParentTop="true"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginRight="5dp" />
             </RelativeLayout>
         </RelativeLayout>

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,14 +12,8 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.Date;
-
 import br.ufscar.connect.Models.Evaluation;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
-import retrofit.Callback;
-import retrofit.Response;
-import retrofit.Retrofit;
 
 
 public class EvaluationActivity extends Activity {
@@ -36,6 +29,7 @@ public class EvaluationActivity extends Activity {
     String nomeLocal;
     String USER_ID;
     Button btn_concluido;
+    Evaluation evaluation;
 
     ConnectUFSCarApi api;
 
@@ -76,65 +70,17 @@ public class EvaluationActivity extends Activity {
         if (v.getId() == R.id.btn_concluido) {
 
             //Verificando erros:
-            if (spinner_espacos.getSelectedItem().toString().contentEquals("")) {
-                spinner_espacos.setPrompt("Escolha o local a avaliar.");
+            //Se o usuario nao selecionou nenhum espaço, exibe mensagem de erro
+            if (spinner_espacos.getSelectedItem().toString().contentEquals("Selecione o espaço")) {
+                Toast.makeText(getApplicationContext(), "Selecione o espaço que deseja avaliar", Toast.LENGTH_LONG).show();
+                return;
             }
 
-            //------------------------------------------------
-            //Pegando notas das categorias e local
-            Evaluation evaluation = new Evaluation();
-            evaluation.setEspaco(spinner_espacos.getSelectedItem().toString() + "");
-            evaluation.setInfra(notaInfra.getRating());
-            evaluation.setAcess(notaAcess.getRating());
-            evaluation.setLimp(notaLimp.getRating());
-            evaluation.setSeg(notaSeg.getRating());
-            evaluation.setGeral(notaGeral.getRating());
-            Date date = new Date(System.currentTimeMillis());
-            evaluation.setDate(date.toString());
+            Toast.makeText(getApplicationContext(), "Avaliação realizada com sucesso", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(getApplicationContext(), AddPublicationActivity.class);
+            startActivity(i);
+            this.finish();
 
-
-            //-------------------------------------------------------------------------------------
-            //Enviando infos ao BD atraves das chamadas definidas na interface ConnectUFSCarApi
-            api.evaluationCreate(evaluation).enqueue(new Callback<Evaluation>() {
-
-                @Override
-                public void onResponse(Response<Evaluation> response, Retrofit retrofit) {
-                    //Se o servidor retornou com sucesso
-                    if (response.isSuccess()) {
-
-                        // Exibe mensagem de sucesso
-                        Toast.makeText(getApplicationContext(), "AVALIAÇÃO REALIZADA COM SUCESSO", Toast.LENGTH_LONG).show();
-
-                        //Volta a tela de Feed
-                        Intent i = new Intent(EvaluationActivity.this, MenuActivity.class);
-                        startActivity(i);
-                        finish();
-
-                    } else {
-                        try {
-                            String error = response.errorBody().string();
-                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
-
-                        } catch (IOException e) {
-                            Log.e("ERROR TAG", e.getMessage(), e);
-
-                            // Exibe mensagem de sucesso
-                            Toast.makeText(getApplicationContext(), "AVALIAÇÃO REALIZADA COM SUCESSO*", Toast.LENGTH_LONG).show();
-
-                            //Volta a tela de Feed
-                            Intent i = new Intent(EvaluationActivity.this, MenuActivity.class);
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    Log.e("ERROR_FAILURE", t.getMessage());
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
         }
     }
 

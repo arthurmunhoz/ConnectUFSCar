@@ -251,7 +251,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                     if (response.isSuccess()) {
 
                         // Exibe mensagem de sucesso
-                        Toast.makeText(getApplicationContext(), "DENÚNCIA REALIZADA COM SUCESSO", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Problema reportado com sucesso!", Toast.LENGTH_LONG).show();
 
                         //Volta a tela de Feed
                         Intent i = new Intent(ReportActivity.this, MenuActivity.class);

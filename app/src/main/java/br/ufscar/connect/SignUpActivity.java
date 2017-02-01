@@ -375,7 +375,7 @@ public class SignUpActivity extends Activity {
                 @Override
                 public void onFailure(Throwable t) {
                     Log.e("ERROR_FAILURE", t.getMessage());
-                    Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!**", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();

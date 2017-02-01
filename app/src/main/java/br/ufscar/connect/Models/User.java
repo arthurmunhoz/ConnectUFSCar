@@ -18,7 +18,7 @@ public class User {
     @SerializedName("image_url")
     private String user_photo;
     @SerializedName("_id")
-    private String user_id;
+    private String id;
 
 
     public User() {
@@ -64,26 +64,23 @@ public class User {
         this.password = password;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public User(String user_type, String name, String last_name, String email, String password, int id) {
+    public User(String user_type, String name, String last_name, String email, String password, String user_id) {
 
         this.user_type = user_type;
         this.name = name;
         this.last_name = last_name;
         this.email = email;
         this.password = password;
-        this.id = id;
+        this.id = user_id;
     }
-
-    private int id;
-
 
     public String getUser_photo() {
         return user_photo;
@@ -102,11 +99,11 @@ public class User {
     }
 
     public String getUser_id() {
-        return user_id;
+        return id;
     }
 
     public void setUser_id(String user_id) {
-        this.user_id = user_id;
+        this.id = user_id;
     }
 }
 
