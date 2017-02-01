@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ public class EvaluationActivity extends Activity {
     RatingBar notaGeral;
     String nomeLocal;
     String USER_ID;
+    Button btn_concluido;
 
     ConnectUFSCarApi api;
 
@@ -55,6 +57,7 @@ public class EvaluationActivity extends Activity {
         notaLimp = (RatingBar) findViewById(R.id.rb_limp);
         notaSeg = (RatingBar) findViewById(R.id.rb_seg);
         notaGeral = (RatingBar) findViewById(R.id.rb_geral);
+        btn_concluido = (Button) findViewById(R.id.btn_concluido);
     }
 
     @Override
@@ -114,6 +117,14 @@ public class EvaluationActivity extends Activity {
 
                         } catch (IOException e) {
                             Log.e("ERROR TAG", e.getMessage(), e);
+
+                            // Exibe mensagem de sucesso
+                            Toast.makeText(getApplicationContext(), "AVALIAÇÃO REALIZADA COM SUCESSO*", Toast.LENGTH_LONG).show();
+
+                            //Volta a tela de Feed
+                            Intent i = new Intent(EvaluationActivity.this, MenuActivity.class);
+                            startActivity(i);
+                            finish();
                         }
                     }
                 }
