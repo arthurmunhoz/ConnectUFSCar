@@ -3,6 +3,7 @@ package br.ufscar.connect;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -206,16 +207,11 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
             //Recebendo informacoes e textos digitados pelo usuario
             Report report = new Report();
-
             report.setProblemAddress(et_address.getText() + "");
-
             int position = et_category.getSelectedItemPosition(); //recebe a posiçao do item selecionado no spinner (int)
             report.setProblemCategory(et_category.getItemAtPosition(position).toString()); //recebe o item selecionado (string)
-
             report.setProblemDescription(et_description.getText() + "");
-
             report.setProblemPhoto(imageURL);
-
             String date = new Date(System.currentTimeMillis()).toString();
             report.setDate(date);
 
@@ -225,17 +221,17 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
             //--------------------------------------------------------------------------------------------
             //Tratando erros
-            if (category.contentEquals("Selecione a categoria")) {
+            if (report.getProblemCategory().contentEquals("Selecione a categoria")) {
                 et_category.setPrompt("Por favor, selecione a CATEGORIA do problema.");
                 return;
             }
 
-            if (description.contentEquals("")) {
+            if (report.getProblemDescription().contentEquals("")) {
                 et_description.setError("Por favor, preencha a DESCRIÇÃO do problema.");
                 return;
             }
 
-            if (address.length() == 0) {
+            if (report.getProblemAddress().length() == 0) {
                 et_description.setError("Por favor, informe o ENDEREÇO do problema.");
                 return;
             }
@@ -338,9 +334,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         if(v.getId() == R.id.btn_tirarfoto) {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
-
         }
-
     }
 
 
@@ -462,7 +456,15 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                 //Enviando a foto para o servidor Cloudinary e salvando o URL na variavel imageURL para salvar no BD
                 new upToCloud().execute();
-                imageURL = (String) resultMap.get("url"); //pegando a url da imagem do retorno do upToCloud
+
+                Picasso.Builder builder = new Picasso.Builder(this);
+                builder.listener(new Picasso.Listener() {
+                    @Override
+                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+                builder.build().load(imageURL).resize(iv_foto.getMaxWidth(), iv_foto.getMaxHeight()).into(iv_foto);
 
             }
         }
@@ -484,10 +486,12 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     //Envia as fotos no formato Uri para o servidor Cloudinary
     private class upToCloud extends AsyncTask<Void, Void, Void> {
 
+        ProgressDialog asyncDialog = new ProgressDialog(ReportActivity.this);
+
         @Override
         protected Void doInBackground(Void... params) {
 
-            imageURL = new String(getPath(imageUri));
+            imageURL = getPath(imageUri);
 
             //Iniciando upload da imagem usando Couldinary
             config = new HashMap();
@@ -503,6 +507,28 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            //set message of the dialog
+            asyncDialog.setMessage("Carregando imagem...");
+            asyncDialog.setCancelable(false);
+            asyncDialog.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            imageURL = (String) resultMap.get("url");
+
+            //hide the dialog
+            if (asyncDialog.isShowing())
+                asyncDialog.dismiss();
+
+            super.onPostExecute(result);
         }
     }
 

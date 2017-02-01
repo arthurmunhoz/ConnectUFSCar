@@ -35,6 +35,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,14 +54,12 @@ import retrofit.Retrofit;
 public class SignUpActivity extends Activity {
 
     //---------------------------------------------
-    //Declarando variaveis
-    String imageURL, imagePath;
-    Spinner et_user_type;
-    Spinner spinner; //spinner para selecao de curso
+    // Declarando variaveis
+    Spinner et_user_type, spinner; //spinner para selecao de curso
     User user = new User();
-
-    public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 1;
-
+    public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
+    static final int REQUEST_CAMERA = 1;
+    static final int SELECT_FILE = 2;
     Map resultMap = new Map() {
         @Override
         public int size() {
@@ -125,31 +124,14 @@ public class SignUpActivity extends Activity {
             return null;
         }
     }, config;
-
     Cloudinary mobileCloudinary;
-
-    Bitmap cameraImage;
-
-    String user_type, username, name, last_name, email, password, password_conf, image_url;
-
+    Bitmap cameraImage, cameraImageResized;
+    String user_type, username, name, last_name, email, password, password_conf, image_url, imageURL, imagePath;
     ImageView iv_profile_pic;
-
     TextView tv_changePicture;
-
-    EditText et_username;
-    EditText et_name;
-    EditText et_last_name;
-    EditText et_email;
-    EditText et_password;
-    EditText et_password_conf;
-
+    EditText et_username, et_name, et_last_name, et_email, et_password, et_password_conf;
     ArrayAdapter<CharSequence> adapter; //adapter para spinner
-
-    static final int REQUEST_CAMERA = 1;
-    static final int SELECT_FILE = 2;
-
     Uri imageUri = null;
-
     private ConnectUFSCarApi api;
 
     @Override
@@ -192,29 +174,107 @@ public class SignUpActivity extends Activity {
 
         if (v.getId() == R.id.iv_profile_picture || v.getId() == R.id.tv_changePicture) {
 
-            final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-            builder.setTitle("Altere sua foto!");
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int item) {
+            //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                    if (items[item].equals("Tire uma foto")) {
+                    //Storage Permission already granted, do what we need
+                    final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+                    builder.setTitle("Altere sua foto!");
+                    builder.setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int item) {
 
-                        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(i, REQUEST_CAMERA);
+                            if (items[item].equals("Tire uma foto")) {
 
-                    } else if (items[item].equals("Escolha da galeria")) {
+                                Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                                startActivityForResult(i, REQUEST_CAMERA);
 
-                        Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(i, SELECT_FILE);
+                            } else if (items[item].equals("Escolha da galeria")) {
 
-                    } else if (items[item].equals("Cancelar")) {
-                        dialog.dismiss();
+                                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                startActivityForResult(i, SELECT_FILE);
+
+                            } else if (items[item].equals("Cancelar")) {
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                    builder.show();
+
+                } else {
+
+                    //Request STORAGE Permission
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                        // Show an explanation to the user *asynchronously* -- don't block
+                        // this thread waiting for the user's response! After the user
+                        // sees the explanation, try again to request the permission.
+                        new AlertDialog.Builder(this)
+                                .setTitle("Permissão necessária")
+                                .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
+                                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
+                                        Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                    public static final int REQUEST_PERMISSION_SETTING = 1;
+
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        //Prompt the user once explanation has been shown
+                                        ActivityCompat.requestPermissions(SignUpActivity.this,
+                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                                MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                        intent.setData(uri);
+                                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+
+                                    }
+                                })
+                                .create()
+                                .show();
+
+                    } else {
+                        // No explanation needed, we can request the permission.
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
                     }
                 }
-            });
-            builder.show();
+            } else {
+                //Storage Permission already granted
+                final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+                builder.setTitle("Altere sua foto!");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+
+                        if (items[item].equals("Tire uma foto")) {
+
+                            Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(i, REQUEST_CAMERA);
+
+                        } else if (items[item].equals("Escolha da galeria")) {
+
+                            Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(i, SELECT_FILE);
+
+                        } else if (items[item].equals("Cancelar")) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+                builder.show();
+            }
 
             return;
         }
@@ -279,43 +339,46 @@ public class SignUpActivity extends Activity {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("image_url", imageURL).apply();
 
-        //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
-        // Prepare the HTTP request
+            //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
+            // Prepare the HTTP request
             api.usersCreate(user).enqueue(new Callback<User>() {
 
-            @Override
-            public void onResponse(Response<User> response, Retrofit retrofit) {
-                //Se o servidor retornou com sucesso
-                if (response.isSuccess()) {
+                @Override
+                public void onResponse(Response<User> response, Retrofit retrofit) {
+                    //Se o servidor retornou com sucesso
+                    if (response.isSuccess()) {
 
-                    // Exibe mensagem de sucesso
-                    Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
+                        // Exibe mensagem de sucesso
+                        Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
 
-                    //Inicia o aplicativo
-                    Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
-                    startActivity(i);
-                    finish();
+                        //Inicia o aplicativo
+                        Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
+                        startActivity(i);
+                        finish();
 
-                } else {
-                    try {
-                        String error = response.errorBody().string();
-                        Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
+                    } else {
+                        try {
+                            String error = response.errorBody().string();
+                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
 
-                    } catch (IOException e) {
-                        Log.e("ERROR TAG", e.getMessage(), e);
+                        } catch (IOException e) {
+                            Log.e("ERROR TAG", e.getMessage(), e);
+                        }
+
+                        Toast.makeText(getApplicationContext(), "Falha de conexão: !response.isSuccess", Toast.LENGTH_LONG).show();
                     }
-
-                    Toast.makeText(getApplicationContext(), "Falha de conexão: !response.isSuccess", Toast.LENGTH_LONG).show();
                 }
-            }
 
-            @Override
-            public void onFailure(Throwable t) {
-                Log.e("ERROR_FAILURE", t.getMessage());
-                Toast.makeText(getApplicationContext(), "FAILURE: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.e("ERROR_FAILURE", t.getMessage());
+                    Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
     }
 
 
@@ -369,8 +432,21 @@ public class SignUpActivity extends Activity {
 
                                 //Imagem capturada salva na variavel imageUri(Uri)
                                 imageUri = data.getData();
+                                cameraImage = (Bitmap) data.getExtras().get("data");
                                 //Fazendo upload da imagem para Cloudinary
                                 new upToCloud().execute();
+
+                                Picasso.Builder builder = new Picasso.Builder(this);
+                                builder.listener(new Picasso.Listener() {
+                                    @Override
+                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                                        exception.printStackTrace();
+                                    }
+                                });
+                                builder.build().load(imageUri)
+                                        .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                                        .transform(new CropCircleTransformation())
+                                        .into(iv_profile_pic);
 
                             } else {
 
@@ -491,6 +567,7 @@ public class SignUpActivity extends Activity {
 
         @Override
         protected void onPreExecute() {
+
             //set message of the dialog
             asyncDialog.setMessage("Carregando imagem...");
             asyncDialog.setCancelable(false);
@@ -514,31 +591,87 @@ public class SignUpActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            imagePath = new String(getPath(imageUri));
+            if (cameraImage != null) {
 
-            //Iniciando upload da imagem usando Couldinary
-            config = new HashMap();
-            config.put("cloud_name", "cloud-connectufscar");
-            config.put("api_key", "726282638648912");
-            config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
-            mobileCloudinary = new Cloudinary(config);
+                //Primeiro reduzimos o tamanho da imagem obtida da camera
+                cameraImageResized = getResizedBitmap(cameraImage, 500);
+                //Depois, pegamos o 'path' dessa imagem Bitmap
+                imageUri = getImageUri(SignUpActivity.this, cameraImageResized);
+                //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
+                imagePath = getPath(imageUri);
 
-            try {
-                resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                //Iniciando upload da imagem usando Couldinary
+                config = new HashMap();
+                config.put("cloud_name", "cloud-connectufscar");
+                config.put("api_key", "726282638648912");
+                config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+                mobileCloudinary = new Cloudinary(config);
+
+                try {
+                    resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            } else {
+
+                //Pegamos os 'path' real da imagem Uri para passar ao CLoudinary
+                imagePath = getPath(imageUri);
+
+                //Iniciando upload da imagem usando Couldinary
+                config = new HashMap();
+                config.put("cloud_name", "cloud-connectufscar");
+                config.put("api_key", "726282638648912");
+                config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+                mobileCloudinary = new Cloudinary(config);
+
+                try {
+                    resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
             }
-
-            return null;
         }
     }
 
 
+    //---------------------------------------------------------------------------------------------
+    // FUNCOES PARA MANIPULACAO DE IMAGENS   ------------------------------------------------------
+
+    //Retorna o 'path' da imagem Uri em String
     public String getPath(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = managedQuery(uri, projection, null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);
+    }
+
+    //Retorna o 'path' de uma imagem Bitmap em Uri
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    //Reduz o tamanho de uma imagem Bitmap
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 }

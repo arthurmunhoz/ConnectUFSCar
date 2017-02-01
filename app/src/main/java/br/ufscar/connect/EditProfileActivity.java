@@ -3,16 +3,18 @@ package br.ufscar.connect;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -33,12 +35,12 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import br.ufscar.connect.Models.User;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -60,23 +62,83 @@ public class EditProfileActivity extends Activity {
 
     Spinner et_user_type;
 
-    EditText et_username;
-    EditText et_name;
-    EditText et_last_name;
-    EditText et_email;
-    EditText et_password;
-    EditText et_password_conf;
+    EditText et_username, et_name, et_last_name, et_email, et_password, et_password_conf;
 
     ArrayAdapter<CharSequence> adapter; //adapter para spinner
 
-    String usertype, username, name, lastname, email, password, password_conf, image_url;
+    String usertype, username, name, lastname, email, password, password_conf, image_url, imageURL, imagePath;
     String USER_NAME, USER_LASTNAME, USER_EMAIL, USER_TYPE, USER_USERNAME, USER_PHOTO, USER_ID;
 
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 1;
 
-    Uri picUri;
+    Uri imageUri;
 
-    Bitmap cameraImage, cameraImage2;
+    Map resultMap = new Map() {
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean containsKey(Object o) {
+            return false;
+        }
+
+        @Override
+        public boolean containsValue(Object o) {
+            return false;
+        }
+
+        @Override
+        public Object get(Object o) {
+            return null;
+        }
+
+        @Override
+        public Object put(Object o, Object o2) {
+            return null;
+        }
+
+        @Override
+        public Object remove(Object o) {
+            return null;
+        }
+
+        @Override
+        public void putAll(Map map) {
+
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @NonNull
+        @Override
+        public Set keySet() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Collection values() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public Set<Entry> entrySet() {
+            return null;
+        }
+    }, config;
+
+    Bitmap cameraImage, cameraImageResized;
 
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
@@ -86,16 +148,12 @@ public class EditProfileActivity extends Activity {
 
     private ConnectUFSCarApi api;
 
+    Cloudinary mobileCloudinary;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-
-        //Essas linhas permitem que o Cloudinary conecte na thread principal
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
 
         //Inicializando API
         api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
@@ -146,6 +204,20 @@ public class EditProfileActivity extends Activity {
     public void onResume() {
         super.onResume();
 
+        //----------------------------------------------------------------------------------------
+        //Completa os objtos do XML com o conteudo adequado
+        assert USER_PHOTO != null;
+        //Toast.makeText(getApplicationContext(), USER_PHOTO, Toast.LENGTH_SHORT).show();
+        if (USER_PHOTO.contentEquals("")) {
+            iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
+        } else {
+            Picasso.with(context).load(USER_PHOTO).into(iv_profile_pic);
+        }
+        et_name.setText(USER_NAME); //completa o TextView com o nome COMPLETO do usuario
+        et_last_name.setText(USER_LASTNAME);
+        et_email.setText(USER_EMAIL); //completa o TextView com o email do usuario
+        et_username.setText(USER_USERNAME);
+
         //Storage Permission already granted
         //Colocando e ajustando a imagem na UI
         //iv_profile_pic.setImageBitmap(cameraImage);
@@ -157,7 +229,7 @@ public class EditProfileActivity extends Activity {
                 exception.printStackTrace();
             }
         });
-        builder.build().load(picUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+        builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
 
     }
 
@@ -353,7 +425,7 @@ public class EditProfileActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("cameraImage", cameraImage);
-        outState.putParcelable("imageUri", picUri);
+        outState.putParcelable("imageUri", imageUri);
     }
 
     // Recover the saved state when the activity is recreated.
@@ -362,14 +434,8 @@ public class EditProfileActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
 
         cameraImage = savedInstanceState.getParcelable("cameraImage");
-        picUri = savedInstanceState.getParcelable("imageUri");
+        imageUri = savedInstanceState.getParcelable("imageUri");
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        //Display alert message when back button has been pressed
-        finish();
     }
 
     @Override
@@ -388,12 +454,12 @@ public class EditProfileActivity extends Activity {
 
                         //Imagem capturada salva na variavel cameraImage (bitmap)
                         cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraImage
-                        picUri = data.getData();
+                        imageUri = data.getData();
 
-                        //Convertendo cameraImage em um InputStream
+                        /*//Convertendo cameraImage em um InputStream
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         cameraImage.compress(Bitmap.CompressFormat.JPEG, 0, stream);
-                        InputStream is = new ByteArrayInputStream(stream.toByteArray());
+                        InputStream is = new ByteArrayInputStream(stream.toByteArray()); */
 
                         //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
                         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -411,7 +477,7 @@ public class EditProfileActivity extends Activity {
                                         exception.printStackTrace();
                                     }
                                 });
-                                builder.build().load(picUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+                                builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
 
 
                             } else {
@@ -474,44 +540,19 @@ public class EditProfileActivity extends Activity {
                                     exception.printStackTrace();
                                 }
                             });
-                            builder.build().load(picUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+                            builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
 
                         }
 
 
                     case SELECT_FILE:
 
-                        //cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraImage
-                        picUri = data.getData();
-
-                        /*
-                        //Convertendo cameraImageBitmap em um InputStream
-                        ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-                        cameraImage.compress(Bitmap.CompressFormat.JPEG, 100, stream2);
-                        InputStream is2 = new ByteArrayInputStream(stream2.toByteArray());   */
-
-                        /*
-                        //--------------------------------------------------------------
-                        //Iniciando upload da imagem usando Couldinary
-                        Map config2 = new HashMap();
-                        config2.put("cloud_name", "cloud-connectufscar");
-                        config2.put("api_key", "726282638648912");
-                        config2.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
-                        Cloudinary mobileCloudinary2 = new Cloudinary(config2);
-
-                        try {
-                            mobileCloudinary2.uploader().upload(is2, ObjectUtils.emptyMap());
-                            //Toast.makeText(getApplicationContext(), is2.toString(), Toast.LENGTH_LONG).show();
-                            Log.e(">>>IMAGE_URI<<< :", imageUri.toString());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        */
+                        imageUri = data.getData();
 
                         //iv_profile_pic.setImageBitmap(cameraImage);
                         //iv_profile_pic.setImageURI(imageUri);
                         iv_profile_pic.setBackground(null);
-                        Picasso.with(this).load(picUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+                        Picasso.with(this).load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
                         iv_profile_pic.setVisibility(View.VISIBLE);
 
                 }//end of SELECT_FILE
@@ -519,11 +560,131 @@ public class EditProfileActivity extends Activity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        //Display alert message when back button has been pressed
+        backButtonHandler();
+
+    }
+
+    public void backButtonHandler() {
+
+        this.finish(); //termina a atividade liberando memória
+    }
+
+    //Envia as fotos no formato Uri para o servidor Cloudinary
+    private class upToCloud extends AsyncTask<Void, Void, Void> {
+
+        ProgressDialog asyncDialog = new ProgressDialog(EditProfileActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+
+            //set message of the dialog
+            asyncDialog.setMessage("Carregando imagem...");
+            asyncDialog.setCancelable(false);
+            asyncDialog.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            imageURL = (String) resultMap.get("url");
+
+            //hide the dialog
+            if (asyncDialog.isShowing())
+                asyncDialog.dismiss();
+
+            super.onPostExecute(result);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            if (cameraImage != null) {
+
+                //Primeiro reduzimos o tamanho da imagem obtida da camera
+                cameraImageResized = getResizedBitmap(cameraImage, 500);
+                //Depois, pegamos o 'path' dessa imagem Bitmap
+                imageUri = getImageUri(EditProfileActivity.this, cameraImageResized);
+                //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
+                imagePath = getPath(imageUri);
+
+
+                //Iniciando upload da imagem usando Couldinary
+                config = new HashMap();
+                config.put("cloud_name", "cloud-connectufscar");
+                config.put("api_key", "726282638648912");
+                config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+                mobileCloudinary = new Cloudinary(config);
+
+                try {
+                    resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            } else {
+
+                //Pegamos os 'path' real da imagem Uri para passar ao CLoudinary
+                imagePath = getPath(imageUri);
+
+                //Iniciando upload da imagem usando Couldinary
+                config = new HashMap();
+                config.put("cloud_name", "cloud-connectufscar");
+                config.put("api_key", "726282638648912");
+                config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
+                mobileCloudinary = new Cloudinary(config);
+
+                try {
+                    resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }
+    }
+
+
+    //---------------------------------------------------------------------------------------------
+    // FUNCOES PARA MANIPULACAO DE IMAGENS   ------------------------------------------------------
+
+    //Retorna o 'path' da imagem Uri em String
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+    //Retorna o 'path' de uma imagem Bitmap em Uri
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
+    }
+
+    //Reduz o tamanho de uma imagem Bitmap
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
 
