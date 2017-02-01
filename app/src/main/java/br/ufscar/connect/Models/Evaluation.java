@@ -26,7 +26,7 @@ public class Evaluation extends Application {
     private String date;
 
     //Construtor
-    public void Evaluation(float infra, float limp, float acess, float seg, float geral) {
+    public void Evaluation(float infra, float limp, float acess, float seg, float geral, String espaco, String date) {
 
         this.Infra = infra;
         this.Limp = limp;

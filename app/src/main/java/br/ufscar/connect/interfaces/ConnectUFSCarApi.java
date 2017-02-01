@@ -38,6 +38,7 @@ public interface ConnectUFSCarApi {
     @POST("login")
     Call<User> login(@Field("username") String username, @Field("password") String password);
 
+    //------------------------------------------------------------------------
     //USUARIOS - CREATE : POST
     @POST("users/create")
     Call<User> usersCreate(@Body User user);
@@ -49,17 +50,19 @@ public interface ConnectUFSCarApi {
                            @Field("name") String name, @Field("lastname") String last_name, @Field("email") String email,
                            @Field("password") String password, @Field("image_url") String image_url);
 
+    //------------------------------------------------------------------------
     //DENUNCIAS - CREATE : POST
     @POST("reports/create")
     Call<Report> reportCreate(@Body Report report);
 
-    //AVALIACOES - CREATE : POST
-    @POST("evaluation/create")
-    Call<Report> evaluationCreate(@Body Evaluation evaluation);
-
     //LISTAR DENUNCIAS : GET
     @GET("reports")
     Call<List<Report>> reportList();
+
+    //------------------------------------------------------------------------
+    //AVALIACOES - CREATE : POST
+    @POST("evaluation/create")
+    Call<Evaluation> evaluationCreate(@Body Evaluation evaluation);
 
     //LISTAR AVALIACOES : GET
     @GET("evalualtions")

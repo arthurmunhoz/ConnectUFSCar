@@ -91,7 +91,7 @@ public class LoginActivity extends Activity {
                     //Se o servidor retornou com sucesso
                     if (response.isSuccess()) {
                         // Exibe mensagem de sucesso
-                        Toast.makeText(c, "BEM VINDO, " + response.body().getName() + "!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(c, "BEM VINDO(A), " + response.body().getName() + "!", Toast.LENGTH_LONG).show();
 
                         //Salva os dados do usuario em SharedPreferences para uso em outras activites
                         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);

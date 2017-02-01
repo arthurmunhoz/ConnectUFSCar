@@ -3,23 +3,19 @@ package br.ufscar.connect;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.security.Timestamp;
 import java.util.Date;
 
 import br.ufscar.connect.Models.Evaluation;
-import br.ufscar.connect.Models.Report;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import retrofit.Callback;
 import retrofit.Response;
@@ -29,9 +25,7 @@ import retrofit.Retrofit;
 public class EvaluationActivity extends Activity {
 
     //DECLARANDO VARIAVEIS
-    public static final int CAMERA_REQUEST = 10;
 
-    ImageView iv_foto;
     Spinner spinner_espacos;
     RatingBar notaInfra;
     RatingBar notaAcess;
@@ -40,8 +34,6 @@ public class EvaluationActivity extends Activity {
     RatingBar notaGeral;
     String nomeLocal;
     String USER_ID;
-    String created_at;
-    Timestamp ts;
 
     ConnectUFSCarApi api;
 
@@ -63,6 +55,16 @@ public class EvaluationActivity extends Activity {
         notaLimp = (RatingBar) findViewById(R.id.rb_limp);
         notaSeg = (RatingBar) findViewById(R.id.rb_seg);
         notaGeral = (RatingBar) findViewById(R.id.rb_geral);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //Recebe os dados do usuario de USER_PREFERENCES
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+        USER_ID = sharedPref.getString("user_id", "");
+
     }
 
     public void onButtonClick(View v) {
@@ -88,16 +90,12 @@ public class EvaluationActivity extends Activity {
             evaluation.setDate(date.toString());
 
 
-            //Recebe os dados do usuario de USER_PREFERENCES
-            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
-            USER_ID = sharedPref.getString("user_id", "");
-
             //-------------------------------------------------------------------------------------
             //Enviando infos ao BD atraves das chamadas definidas na interface ConnectUFSCarApi
-            api.evaluationCreate(evaluation).enqueue(new Callback<Report>() {
+            api.evaluationCreate(evaluation).enqueue(new Callback<Evaluation>() {
 
                 @Override
-                public void onResponse(Response<Report> response, Retrofit retrofit) {
+                public void onResponse(Response<Evaluation> response, Retrofit retrofit) {
                     //Se o servidor retornou com sucesso
                     if (response.isSuccess()) {
 
@@ -151,33 +149,17 @@ public class EvaluationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        //O usuario escolheu OK depois de tirar a foto? Se sim, armazena a foto e a coloca no ImageView invisivel e o torna visivel
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CAMERA_REQUEST){
-
-                Bitmap cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraIamgem
-
-                iv_foto.setImageBitmap(cameraImage);
-                iv_foto.setVisibility(View.VISIBLE);
-            }
-        }
-
-    }
 
     @Override
     public void onBackPressed() {
         //Display alert message when back button has been pressed
         backButtonHandler();
-        return;
+
     }
 
     public void backButtonHandler() {
 
-        finish(); //termina a atividade liberando memória
+        this.finish(); //termina a atividade liberando memória
     }
 
 }
