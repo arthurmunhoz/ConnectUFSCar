@@ -31,6 +31,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.squareup.picasso.Picasso;
@@ -52,6 +54,8 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+//import com.android.volley.Response;
+
 
 @SuppressWarnings("ALL")
 public class SignUpActivity extends Activity {
@@ -59,11 +63,20 @@ public class SignUpActivity extends Activity {
     //---------------------------------------------
     // Declarando variaveis
     File imageFile;
+
+    RequestQueue requestQueue;
+
     Spinner et_user_type, spinner; //spinner para selecao de curso
+
+    StringRequest stringRequest;
+
     User user = new User();
+
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
+    public static final String USER_CREATE_URL = "http://138.197.20.132:8000/users/create";
+
     Map resultMap = new Map() {
         @Override
         public int size() {
@@ -128,15 +141,25 @@ public class SignUpActivity extends Activity {
             return null;
         }
     }, config;
+
     Cloudinary mobileCloudinary;
+
     Bitmap cameraImage, cameraImageResized;
+
     String user_type, username, name, last_name, email, password, password_conf, image_url, imageURL, imagePath;
+
     ImageView iv_profile_pic;
+
     TextView tv_changePicture;
+
     EditText et_username, et_name, et_last_name, et_email, et_password, et_password_conf;
+
     ArrayAdapter<CharSequence> adapter; //adapter para spinner
+
     Uri imageUri = null;
+
     private ConnectUFSCarApi api;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -344,6 +367,61 @@ public class SignUpActivity extends Activity {
             editor.putString("image_url", imageURL).apply();
 
             //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
+            /*
+            //---- Request usaing VOLLEY ----
+            stringRequest = new StringRequest(Request.Method.POST, USER_CREATE_URL,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(SignUpActivity.this,response,Toast.LENGTH_LONG).show();
+                            Log.d("Response", response);
+
+
+                            // Exibe mensagem de sucesso
+                            Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
+                            Log.d("Error.Response", response);
+
+                            //Inicia o aplicativo
+                            Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
+                            startActivity(i);
+                            finish();
+
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            if(error!=null && error.getMessage() !=null){
+                                Toast.makeText(getApplicationContext(),"error VOLLEY "+error.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Something went wrong",Toast.LENGTH_LONG).show();
+
+                            }
+                        }
+                    }) {
+
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put(username,    user.getUsername());
+                    params.put(name,        user.getName());
+                    params.put(image_url,   user.getUser_photo());
+                    params.put(password,    user.getPassword());
+                    params.put(user_type,   user.getUser_type());
+                    params.put(email,       user.getEmail());
+                    params.put(last_name,   user.getLast_name());
+                    return params;
+                }
+            };
+
+            requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+            */
+
+
+            //---- Request using RETROFIT ----
             // Prepare the HTTP request
             Call<User> call = api.usersCreate(user);
             call.enqueue(new Callback<User>() {
@@ -385,6 +463,7 @@ public class SignUpActivity extends Activity {
                 }
 
             });
+
 
         }
     }

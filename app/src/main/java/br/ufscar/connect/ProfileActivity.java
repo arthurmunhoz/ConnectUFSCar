@@ -23,6 +23,7 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 public class ProfileActivity extends Activity {
 
     //Declarando variaveis
+    RelativeLayout infosProfile;
     TextView tv_name;
     TextView tv_usertype;
     TextView tv_useremail;
@@ -57,6 +58,7 @@ public class ProfileActivity extends Activity {
         lv_my_publications = (ListView) findViewById(R.id.lv_my_publications);
         tv_my_publications = (TextView) findViewById(R.id.tv_titlemypublications);
         btn_edit_profile = (ImageButton) findViewById(R.id.btn_edit_profile);
+        infosProfile = (RelativeLayout) findViewById(R.id.InfosProfile);
 
     }
 
@@ -146,6 +148,7 @@ public class ProfileActivity extends Activity {
                 tv_usertype.setVisibility(View.GONE);
                 btn_edit_profile.setVisibility(View.GONE);
                 tv_username.setVisibility(View.GONE);
+                infosProfile.setVisibility(View.GONE);
 
             } else {
                 if (tv_name.getVisibility() == View.GONE) {
@@ -156,6 +159,7 @@ public class ProfileActivity extends Activity {
                     tv_usertype.setVisibility(View.VISIBLE);
                     btn_edit_profile.setVisibility(View.VISIBLE);
                     tv_username.setVisibility(View.VISIBLE);
+                    infosProfile.setVisibility(View.VISIBLE);
                     margins.setMargins(0, 5, 0, 0);
                     params.addRule(RelativeLayout.BELOW, R.id.InfosProfile);
                     params2.addRule(RelativeLayout.BELOW, R.id.tv_titlemypublications);
