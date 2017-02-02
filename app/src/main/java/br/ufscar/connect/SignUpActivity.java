@@ -47,6 +47,7 @@ import br.ufscar.connect.Models.User;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import id.zelory.compressor.Compressor;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
+import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
@@ -344,10 +345,12 @@ public class SignUpActivity extends Activity {
 
             //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
             // Prepare the HTTP request
-            api.usersCreate(user).enqueue(new Callback<User>() {
+            Call<User> call = api.usersCreate(user);
+            call.enqueue(new Callback<User>() {
 
                 @Override
                 public void onResponse(Response<User> response, Retrofit retrofit) {
+
                     //Se o servidor retornou com sucesso
                     if (response.isSuccess()) {
 
@@ -374,13 +377,15 @@ public class SignUpActivity extends Activity {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Log.e("ERROR_FAILURE", t.getMessage());
+                    Log.e("ERROR_FAILURE: ", t.getMessage());
                     Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!**", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();
                 }
+
             });
+
         }
     }
 
