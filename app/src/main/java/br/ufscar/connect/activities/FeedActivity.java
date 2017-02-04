@@ -17,9 +17,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import br.ufscar.connect.adapters.FeedEvaluationListAdapter;
+import br.ufscar.connect.adapters.FeedProblemListAdapter;
+import br.ufscar.connect.models.FeedEvaluationPost;
+import br.ufscar.connect.models.FeedProblemPost;
 import br.ufscar.connect.models.Report;
 import br.ufscar.connect.R;
-import br.ufscar.connect.adapters.FeedActivityCustomAdapter;
 
 
 public class FeedActivity extends Activity {
@@ -47,51 +53,9 @@ public class FeedActivity extends Activity {
 
     Context context;
 
+    FeedEvaluationListAdapter evaluationListAdapter;
+    FeedProblemListAdapter problemListAdapter;
 
-    //Declarando arrays para dados das publicações
-
-    /*Array para Profile Pic.*/ public static int[] user_photo_list = {R.drawable.perfilphoto, R.drawable.perfilphoto2, R.drawable.perfilphoto3, R.drawable.perfilphoto4};
-    /*Array de Publ. Photos*/   public static int[] all_publication_photo_list = {R.drawable.danosgramado, R.drawable.vazamentoagua, R.drawable.redeeletrica, R.drawable.caixadaguavazando};
-    /*Array de Usernames*/      public String[] publ_usernames = {"Arthur Regatieri Munhoz", "Breno Calixto", "Guiherme MMuniz Cardoso", "Marco Alexandre Andrade"};
-    /*Array de Usertypes*/      public String[] publ_usertypes = {"Aluno de Graduação", "Aluno de Graduação", "Aluno de Graduação", "Aluno de Graduação"};
-    /*Array de Dates*/          public String[] publ_dates = {"27/11/2016", "30/11/2016", "01/12/2016", "22/11/2016"};
-    /*Array de Types*/          public static String[] all_publication_type_list = {"Danos ao Patrimônio", "Vazamento D'água", "Rede Eletrica", "Vazamento D'agua"};
-    /*Array de Addresses*/      public String[] all_publication_address_list = {"Rua da Praça da Bandeira, 1500", "Rua Biblioteca Comunitária, 123", "Rua dos Ypês, 345", "Rua Biblioteca Comunitária, 65"};
-    /*Array de Descriptions*/   public String[] all_publication_description_list = {"Carros danificaram a grama da praça pois estavam " +
-            "estacionados em local indevido.", "Há um cano quebrado que está vazando muita água!", "Há um poste de energia danificado pela chuva " +
-            "que apresenta cabos desencapados e oferece perigo aos pedestres que ali passam.", "Tubulacao da caixa d'água se encontra estourada"};
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
-        context = this;
-
-        //Referencia as variáveis aos objetos do XML
-        cv_separator = (View) findViewById(R.id.cv_separator);
-
-        btnEvaluations = (Button) findViewById(R.id.btn_evalutaions);
-        btnProblems = (Button) findViewById(R.id.btn_problems);
-
-        iv_user_photo = (ImageView) findViewById(R.id.iv_user_photo);
-        iv_publ_photo = (ImageView) findViewById(R.id.iv_publ_photo);
-
-        tv_username = (TextView) findViewById(R.id.tv_name);
-        tv_usertype = (TextView) findViewById(R.id.tv_usertype);
-        tv_date = (TextView) findViewById(R.id.tv_date);
-        tv_type = (TextView) findViewById(R.id.tv_type);
-        tv_adrress = (TextView) findViewById(R.id.tv_address);
-        tv_description = (TextView) findViewById(R.id.tv_description);
-
-        lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
-
-        //Completa os objtos da LISTA DE PUBLICACOES atraves do adapter personalizado e passa como parametro
-        // os arrays declarados e inicializados anteriormente neste arquivo
-        lv_all_publications.setAdapter(new FeedActivityCustomAdapter(this, user_photo_list,
-                publ_usernames, publ_usertypes, publ_dates, all_publication_address_list,
-                all_publication_type_list, all_publication_description_list, all_publication_photo_list));
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -117,6 +81,8 @@ public class FeedActivity extends Activity {
 
             btnProblems.setBackgroundResource(R.drawable.btnfundoallsides);
             btnProblems.setTextColor(Color.parseColor("#ffcacaca"));
+
+            lv_all_publications.setAdapter(evaluationListAdapter);
         }
 
         if (v.getId() == R.id.btn_problems) {
@@ -128,8 +94,67 @@ public class FeedActivity extends Activity {
             btnEvaluations.setBackgroundResource(R.drawable.btnfundoallsides);
             btnEvaluations.setTextColor(Color.parseColor("#ffcacaca"));
 
+            lv_all_publications.setAdapter(problemListAdapter);
         }
 
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_feed);
+        context = this;
+
+        //Referencia as variáveis aos objetos do XML
+        cv_separator = (View) findViewById(R.id.cv_separator);
+
+        btnEvaluations = (Button) findViewById(R.id.btn_evalutaions);
+        btnProblems = (Button) findViewById(R.id.btn_problems);
+
+        iv_user_photo = (ImageView) findViewById(R.id.iv_user_photo);
+        iv_publ_photo = (ImageView) findViewById(R.id.iv_publ_photo);
+
+        tv_username = (TextView) findViewById(R.id.tv_name);
+        tv_usertype = (TextView) findViewById(R.id.tv_usertype);
+        tv_date = (TextView) findViewById(R.id.tv_date);
+        tv_type = (TextView) findViewById(R.id.tv_type);
+        tv_adrress = (TextView) findViewById(R.id.tv_address);
+        tv_description = (TextView) findViewById(R.id.tv_description);
+
+        lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
+
+        //Declarando arrays para dados das publicações
+        //Publicações de problemas
+        List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+
+        feedProblemPostList.add(new FeedProblemPost("Arthur Regatieri Munhoz", "Aluno de Graduação", "27/11/2016", "Rua da Praça da Bandeira, 1500",
+                "Danos ao Patrimônio", "Carros danificaram a grama da praça pois estavam estacionados em local indevido.",
+                R.drawable.danosgramado, R.drawable.perfilphoto));
+        feedProblemPostList.add(new FeedProblemPost("Breno Calixto", "Aluno de Graduação", "30/11/2016", "Rua Biblioteca Comunitária, 123",
+                "Vazamento D'água", "Há um cano quebrado que está vazando muita água!",
+                R.drawable.vazamentoagua, R.drawable.perfilphoto2));
+        feedProblemPostList.add(new FeedProblemPost("Guiherme MMuniz Cardoso", "Aluno de Graduação", "01/12/2016", "Rua dos Ypês, 345",
+                "Rede Eletrica", "Há um poste de energia danificado pela chuva que apresenta cabos desencapados e oferece perigo aos pedestres que ali passam.",
+                R.drawable.redeeletrica, R.drawable.perfilphoto3));
+        feedProblemPostList.add(new FeedProblemPost("Marco Alexandre Andrade", "Aluno de Graduação", "22/11/2016", "Rua Biblioteca Comunitária, 65",
+                "Vazamento D'agua", "Tubulacao da caixa d'água se encontra estourada",
+                R.drawable.caixadaguavazando, R.drawable.perfilphoto4));
+
+        //Publicações de Avaliações
+        List<FeedEvaluationPost> feedEvaluationPostList = new ArrayList<>();
+        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto, "Arthur Regatieri Munhoz", "Aluno de Graduação", "02/02/2017",
+                "Departamento de Computação", (float)4.5, (float)4.0, (float)3.5, (float)4.0, (float)4.0));
+        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto2, "Breno Calixto", "Aluno de Graduação", "04/02/2017",
+                "Departamento de Matemática", 3.0f, 3.0f, 4.5f, 5.0f, 2.0f));
+        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto4, "Marco Alexandre Andrade", "Aluno de Graduação", "04/02/2017",
+                "Departamento de QualquerCoisa", 5.0f, 5.0f, 5.0f, 5.0f, 5.0f));
+
+
+        this.evaluationListAdapter = new FeedEvaluationListAdapter(this, feedEvaluationPostList);
+        this.problemListAdapter = new FeedProblemListAdapter(this, feedProblemPostList);
+
+        lv_all_publications.setAdapter(problemListAdapter);
     }
 
     @Override

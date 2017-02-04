@@ -83,7 +83,8 @@
         android:layout_below="@+id/tv_place_name"
         android:layout_alignLeft="@+id/tv_date"
         android:layout_alignStart="@+id/tv_date"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:text="Infraestrutura" />
 
 
     <TextView
@@ -95,7 +96,8 @@
         android:layout_alignStart="@+id/tv_infra"
         android:layout_alignRight="@+id/tv_infra"
         android:layout_alignEnd="@+id/tv_infra"
-        android:textSize="12dp" />
+        android:textSize="12dp"
+        android:text="Acessibilidade" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -106,7 +108,8 @@
         android:layout_alignStart="@+id/tv_acess"
         android:layout_alignRight="@+id/tv_acess"
         android:layout_alignEnd="@+id/tv_acess"
-        android:textSize="12dp" />
+        android:textSize="12dp"
+        android:text="Limpeza" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -117,7 +120,8 @@
         android:layout_alignEnd="@+id/tv_limpeza"
         android:layout_alignLeft="@+id/tv_limpeza"
         android:layout_alignStart="@+id/tv_limpeza"
-        android:textSize="12dp" />
+        android:textSize="12dp"
+        android:text="Segurança" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -129,7 +133,8 @@
         android:layout_alignRight="@+id/tv_seg"
         android:layout_alignEnd="@+id/tv_seg"
         android:textSize="12dp"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="20dp"
+        android:text="Geral" />
 
     <RatingBar
         android:layout_width="wrap_content"
@@ -166,7 +171,7 @@
         android:theme="@style/RatingBar"
         style="?attr/ratingBarStyleSmall"
         android:stepSize="0.5"
-        android:rating="4"
+        android:rating="3"
         android:numStars="5" />
 
     <RatingBar
