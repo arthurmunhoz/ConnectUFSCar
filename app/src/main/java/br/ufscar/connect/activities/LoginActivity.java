@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -17,7 +17,8 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import br.ufscar.connect.Models.User;
+import br.ufscar.connect.models.User;
+import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import retrofit.Callback;
 import retrofit.Response;

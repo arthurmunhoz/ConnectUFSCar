@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import br.ufscar.connect.activities.ProfileActivity;
+import br.ufscar.connect.R;
 
 
 public class ProfileActivityCustomAdapter extends BaseAdapter {

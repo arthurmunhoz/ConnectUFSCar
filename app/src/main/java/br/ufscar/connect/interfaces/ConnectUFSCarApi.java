@@ -2,9 +2,9 @@ package br.ufscar.connect.interfaces;
 
 import java.util.List;
 
-import br.ufscar.connect.Models.Evaluation;
-import br.ufscar.connect.Models.Report;
-import br.ufscar.connect.Models.User;
+import br.ufscar.connect.models.Evaluation;
+import br.ufscar.connect.models.Report;
+import br.ufscar.connect.models.User;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
@@ -65,7 +65,7 @@ public interface ConnectUFSCarApi {
     Call<Evaluation> evaluationCreate(@Body Evaluation evaluation);
 
     //LISTAR AVALIACOES : GET
-    @GET("evalualtions")
+    @GET("evaluations")
     Call<List<Evaluation>> evaluationList();
 
 }

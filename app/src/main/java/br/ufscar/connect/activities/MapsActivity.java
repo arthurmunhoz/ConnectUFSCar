@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -34,6 +34,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import br.ufscar.connect.R;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,

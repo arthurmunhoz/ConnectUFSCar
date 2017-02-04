@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -47,7 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import br.ufscar.connect.Models.Report;
+import br.ufscar.connect.models.Report;
+import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import retrofit.Callback;
 import retrofit.Response;

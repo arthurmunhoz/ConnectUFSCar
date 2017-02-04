@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -42,7 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import br.ufscar.connect.Models.User;
+import br.ufscar.connect.models.User;
+import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit.Callback;
@@ -229,7 +230,8 @@ public class EditProfileActivity extends Activity {
                 exception.printStackTrace();
             }
         });
-        builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
+        if (USER_PHOTO != null && !USER_PHOTO.equals(""))
+            builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
 
     }
 

@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import br.ufscar.connect.R;
 
 
 public class AddPublicationActivity extends Activity {

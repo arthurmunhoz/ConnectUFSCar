@@ -1,13 +1,11 @@
-package br.ufscar.connect.Models;
-
-import android.app.Application;
+package br.ufscar.connect.models;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Arthur on 06/12/2016.
  */
-public class Report extends Application {
+public class Report {
 
     //Declarando atributos
     @SerializedName("image_url")

@@ -1,4 +1,4 @@
-package br.ufscar.connect.Models;
+package br.ufscar.connect.models;
 
 import com.google.gson.annotations.SerializedName;
 

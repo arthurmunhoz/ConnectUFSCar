@@ -56,7 +56,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context="br.ufscar.connect.ReportActivity"
+            tools:context="br.ufscar.connect.activities.ReportActivity"
             android:id="@+id/relativeLayout1"
             android:configChanges="orientation|keyboardHidden"
             android:background="#66d3d3d3"

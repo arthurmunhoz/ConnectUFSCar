@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.TabActivity;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
+
+import br.ufscar.connect.R;
 
 
 @SuppressWarnings("deprecation")

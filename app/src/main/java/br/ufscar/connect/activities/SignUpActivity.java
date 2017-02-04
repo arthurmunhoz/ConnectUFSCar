@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -45,7 +45,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import br.ufscar.connect.Models.User;
+import br.ufscar.connect.models.User;
+import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 import id.zelory.compressor.Compressor;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;

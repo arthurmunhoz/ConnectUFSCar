@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +12,8 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import br.ufscar.connect.Models.Evaluation;
+import br.ufscar.connect.models.Evaluation;
+import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
 
 

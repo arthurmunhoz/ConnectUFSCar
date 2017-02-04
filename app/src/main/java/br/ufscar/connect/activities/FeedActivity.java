@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,7 +17,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import br.ufscar.connect.Models.Report;
+import br.ufscar.connect.models.Report;
+import br.ufscar.connect.R;
+import br.ufscar.connect.adapters.FeedActivityCustomAdapter;
 
 
 public class FeedActivity extends Activity {
@@ -164,7 +166,7 @@ public class FeedActivity extends Activity {
         // Setting Dialog Title
         alertDialog.setTitle("SAINDO...");
         // Setting Dialog Message
-        alertDialog.setMessage("Tem certeza que deseja que sair?");
+        alertDialog.setMessage("Tem certeza que deseja sair?");
         // Setting Icon to Dialog
         alertDialog.setIcon(R.drawable.doorcolored);
         // Setting Positive "Yes" Button

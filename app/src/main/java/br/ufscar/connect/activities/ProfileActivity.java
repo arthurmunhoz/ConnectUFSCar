@@ -1,4 +1,4 @@
-package br.ufscar.connect;
+package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import br.ufscar.connect.R;
+import br.ufscar.connect.adapters.ProfileActivityCustomAdapter;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 
@@ -79,14 +81,17 @@ public class ProfileActivity extends Activity {
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
         iv_profile_pic.setVisibility(View.VISIBLE);
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.listener(new Picasso.Listener() {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                exception.printStackTrace();
-            }
-        });
-        builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
+
+        if (USER_PHOTO != null && !USER_PHOTO.equals("")) {
+            Picasso.Builder builder = new Picasso.Builder(this);
+            builder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+            builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
+        }
 
         tv_name.setText(USER_NAME + " " + USER_LASTNAME); //completa o TextView com o nome COMPLETO do usuario
         tv_usertype.setText(USER_TYPE); //completa o TextView com o tipo do usuario
