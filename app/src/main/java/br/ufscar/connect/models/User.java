@@ -24,6 +24,17 @@ public class User {
     public User() {
     }
 
+    public User(String user_type, String username, String name, String last_name, String email, String password, String user_photo, String id) {
+        this.user_type = user_type;
+        this.username = username;
+        this.name = name;
+        this.last_name = last_name;
+        this.email = email;
+        this.password = password;
+        this.user_photo = user_photo;
+        this.id = id;
+    }
+
     public String getUser_type() {
         return user_type;
     }

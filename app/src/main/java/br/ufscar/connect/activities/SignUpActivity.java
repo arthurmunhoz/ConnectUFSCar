@@ -76,7 +76,6 @@ public class SignUpActivity extends Activity {
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
-    public static final String USER_CREATE_URL = "http://138.197.20.132:8000/users/create";
 
     Map resultMap = new Map() {
         @Override

@@ -297,6 +297,7 @@ public class EditProfileActivity extends Activity {
             sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
             USER_PHOTO = sharedPref.getString("image_url", "");
             image_url = USER_PHOTO;
+            String userid = sharedPref.getString("user_id","");
 
             //-----------------------------------------------------------------
             //-------------------- VERIFICACOES DE ERROS ----------------------
@@ -342,9 +343,11 @@ public class EditProfileActivity extends Activity {
                 return;
             }// end of VERIFICACAO DE ERROS
 
+
             //-------------------------------------------------------------------------------------
             //REQUEST: USER_UPDATE - ATUALIZA INFORMAÇÕES DO USUÁRIO NO BANCO DE DADOS
-            api.usersUpdate(usertype, username, name, lastname, email, password, image_url).enqueue(new Callback<User>() {
+            User user = new User(usertype, username, name, lastname, email, password, image_url, userid);
+            api.usersUpdate(user).enqueue(new Callback<User>() {
 
                 @Override
                 public void onResponse(Response<User> response, Retrofit retrofit) {

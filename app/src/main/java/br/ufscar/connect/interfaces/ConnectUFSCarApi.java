@@ -44,11 +44,8 @@ public interface ConnectUFSCarApi {
     Call<User> usersCreate(@Body User user);
 
     //USUARIOS - UPDATE : PUT
-    @FormUrlEncoded
     @PUT("users/update")
-    Call<User> usersUpdate(@Field("usertype") String user_type, @Field("username") String username,
-                           @Field("name") String name, @Field("lastname") String last_name, @Field("email") String email,
-                           @Field("password") String password, @Field("image_url") String image_url);
+    Call<User> usersUpdate(@Body User user);
 
     //------------------------------------------------------------------------
     //DENUNCIAS - CREATE : POST
