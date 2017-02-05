@@ -12,10 +12,17 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.Evaluation;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 
 public class EvaluationActivity extends Activity {
@@ -78,10 +85,36 @@ public class EvaluationActivity extends Activity {
                 return;
             }
 
-            Toast.makeText(getApplicationContext(), "Avaliação realizada com sucesso!", Toast.LENGTH_LONG).show();
-            Intent i = new Intent(getApplicationContext(), MenuActivity.class);
-            startActivity(i);
-            finish();
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+            String userId = sharedPref.getString("user_id", "");
+            String espaco = spinner_espacos.getSelectedItem().toString();
+            String data = dateFormat.format(new Date());
+            Evaluation evaluation = new Evaluation(userId, espaco, data, notaInfra.getRating(), notaLimp.getRating(), notaAcess.getRating(),
+                    notaSeg.getRating(), notaGeral.getRating());
+
+            Call call = api.evaluationCreate(evaluation);
+            call.enqueue(new Callback() {
+                             @Override
+                             public void onResponse(Response response, Retrofit retrofit) {
+                                 if (response.code() == 200)
+                                     Toast.makeText(getApplicationContext(), "Avaliação realizada com sucesso!", Toast.LENGTH_LONG).show();
+                                 else
+                                     Toast.makeText(getApplicationContext(), "Avaliação não pode ser enviada!", Toast.LENGTH_LONG).show();
+                                 Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                                 startActivity(i);
+                                 finish();
+                             }
+
+                             @Override
+                             public void onFailure(Throwable t) {
+                                 Toast.makeText(getApplicationContext(), "Avaliação não pode ser enviada!", Toast.LENGTH_LONG).show();
+                                 Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                                 startActivity(i);
+                                 finish();
+                             }
+                         });
         }
     }
 
