@@ -373,11 +373,11 @@ public class EditProfileActivity extends Activity {
                         config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
                         Cloudinary mobileCloudinary = new Cloudinary(config);
 
-                        try {
-                            mobileCloudinary.uploader().upload(response.body().getUser_photo(), ObjectUtils.emptyMap());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            mobileCloudinary.uploader().upload(response.body().getUser_photo(), ObjectUtils.emptyMap());
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
 
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Dados atualizados com sucesso!", Toast.LENGTH_LONG).show();
