@@ -66,7 +66,7 @@ public interface ConnectUFSCarApi {
 
     //------------------------------------------------------------------------
     //AVALIACOES - CREATE : POST
-    @POST("evaluation/create")
+    @POST("evaluations/create")
     Call<Evaluation> evaluationCreate(@Body Evaluation evaluation);
 
     //LISTAR AVALIACOES : GET
