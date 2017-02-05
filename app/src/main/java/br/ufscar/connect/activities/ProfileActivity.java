@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +18,17 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.R;
-import br.ufscar.connect.adapters.ProfileActivityCustomAdapter;
+import br.ufscar.connect.adapters.FeedProblemListAdapter;
+import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import br.ufscar.connect.models.FeedProblemPost;
+import br.ufscar.connect.models.Report;
+import br.ufscar.connect.models.User;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 
@@ -36,19 +46,16 @@ public class ProfileActivity extends Activity {
     ImageButton btn_edit_profile;
     TextView tv_username;
     String USER_NAME, USER_LASTNAME, USER_EMAIL, USER_TYPE, USER_USERNAME, USER_PHOTO, USER_ID;
-
-    //Definindo arrays com os dados das publicações
-    /*Var. para Profile Pic.*/  //public int profile_picture = ;
-    /*Array de Photos*/         public static int[] my_publication_photo_list = {R.drawable.danosgramado, R.drawable.vazamentoagua, R.drawable.redeeletrica};
-    /*Array de Types*/          public static String[] my_publication_type_list = {"Danos ao Patrimônio", "Vazamento D'água", "Rede Eletrica"};
-    /*Array de Addresses*/      public String[] my_publication_address_list = {"Rua da Praça da Bandeira, 1500", "Rua Biblioteca Comunitária, 123", "Rua dos Ypês, 345"};
-    /*Array de Descriptions*/   public String[] my_publication_description_list = {"Carros danificaram a grama da praça pois estavam estacionados em local indevido.", "Há um cano quebrado que está vazando muita água!", "Há um poste de energia danificado pela chuva que apresenta cabos desencapados e oferece perigo aos pedestres que ali passam."};
+    private static String userId;
+    private static List<FeedProblemPost> feedProblemPostList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         context = this;
+
+       loadPublicationsTask().execute();
 
         //----------------------------------------------------------------------------------------
         //Referenciando os objetos do XML
@@ -61,7 +68,6 @@ public class ProfileActivity extends Activity {
         tv_my_publications = (TextView) findViewById(R.id.tv_titlemypublications);
         btn_edit_profile = (ImageButton) findViewById(R.id.btn_edit_profile);
         infosProfile = (RelativeLayout) findViewById(R.id.InfosProfile);
-
     }
 
     public void onResume() {
@@ -77,6 +83,7 @@ public class ProfileActivity extends Activity {
         USER_USERNAME = sharedPref.getString("username", "");
         USER_TYPE = sharedPref.getString("usertype", "");
         USER_PHOTO = sharedPref.getString("image_url", "");
+        userId = USER_ID;
 
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
@@ -97,28 +104,17 @@ public class ProfileActivity extends Activity {
         tv_usertype.setText(USER_TYPE); //completa o TextView com o tipo do usuario
         tv_useremail.setText(USER_EMAIL); //completa o TextView com o email do usuario
         tv_username.setText(USER_USERNAME);
-        lv_my_publications.setAdapter(new ProfileActivityCustomAdapter(this, my_publication_type_list,
-                my_publication_address_list, my_publication_description_list, my_publication_photo_list));
 
-        //----------------------------------------------------------------------------------------
-        //Completa os objtos do XML com o conteudo adequado
-        //assert USER_PHOTO != null;
-        if (USER_PHOTO.contentEquals("")) {
-            iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
-        } else {
-            iv_profile_pic.setBackground(null);
-            Picasso.with(this).load(USER_PHOTO)
-                    .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                    .into(iv_profile_pic);
+        // FIXME: péssima gambiarra abaixo. Fica aguardando a task carregar as listas
+        while (this.feedProblemPostList == null){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        tv_name.setText(USER_NAME + " " + USER_LASTNAME); //completa o TextView com o nome COMPLETO do usuario
-        tv_usertype.setText(USER_TYPE); //completa o TextView com o tipo do usuario
-        tv_useremail.setText(USER_EMAIL); //completa o TextView com o email do usuario
-        tv_username.setText(USER_USERNAME);
-        lv_my_publications.setAdapter(new ProfileActivityCustomAdapter(this, my_publication_type_list,
-                my_publication_address_list, my_publication_description_list, my_publication_photo_list));
-
+        lv_my_publications.setAdapter(new FeedProblemListAdapter(this, feedProblemPostList));
     }
 
     @Override
@@ -206,4 +202,39 @@ public class ProfileActivity extends Activity {
     }
 
 
+    public AsyncTask loadPublicationsTask() {
+        final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
+
+        return new AsyncTask() {
+            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                try {
+                    List<Report> reportList = api.reportList().execute().body();
+                    User user = api.getUser(ProfileActivity.userId).execute().body();
+
+                    for (Report r : reportList) {
+                        if (r.getUser_id().equals(ProfileActivity.userId)) {
+                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
+                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
+                                    r.getProblemPhoto(), user.getUser_photo());
+                            feedProblemPostList.add(post);
+                        }
+                    }
+                    // FIXME: as duas linhas a baixo deviam estar no onPostExecute, mas por algum motivo ele nao tá sendo chamado nunca...
+                    ProfileActivity.feedProblemPostList = feedProblemPostList;
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+            }
+        };
+    }
 }
