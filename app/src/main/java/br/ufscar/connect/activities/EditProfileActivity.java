@@ -347,7 +347,7 @@ public class EditProfileActivity extends Activity {
 
             //-------------------------------------------------------------------------------------
             //REQUEST: USER_UPDATE - ATUALIZA INFORMAÇÕES DO USUÁRIO NO BANCO DE DADOS
-            User user = new User(usertype, username, name, lastname, email, password, image_url, userid);
+            final User user = new User(usertype, username, name, lastname, email, password, image_url, userid);
             api.usersUpdate(user).enqueue(new Callback<User>() {
 
                 @Override
@@ -358,12 +358,12 @@ public class EditProfileActivity extends Activity {
                         //Salva os dados do usuario em SharedPreferences para uso em outras activites
                         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("name", response.body().getName()).apply();
-                        editor.putString("lastname", response.body().getLast_name()).apply();
-                        editor.putString("email", response.body().getEmail()).apply();
-                        editor.putString("usertype", response.body().getUser_type()).apply();
-                        editor.putString("image_url", response.body().getUser_photo()).apply();
-                        editor.putString("username", response.body().getUsername()).apply();
+                        editor.putString("name", user.getName()).apply();
+                        editor.putString("lastname", user.getLast_name()).apply();
+                        editor.putString("email", user.getEmail()).apply();
+                        editor.putString("usertype", user.getUser_type()).apply();
+                        editor.putString("image_url", user.getUser_photo()).apply();
+                        editor.putString("username", user.getUsername()).apply();
 
                         //--------------------------------------------------------------
                         //Iniciando upload da imagem usando Couldinary
