@@ -5,7 +5,7 @@ package br.ufscar.connect.models;
  */
 
 public class FeedEvaluationPost {
-    int userPhotoId;
+    String userPhotoUrl;
     String userName;
     String userType;
     String date;
@@ -16,8 +16,8 @@ public class FeedEvaluationPost {
     float ratingSeguranca;
     float ratingGeral;
 
-    public FeedEvaluationPost(int userPhotoId, String userName, String userType, String date, String placeName, float ratingInfra, float ratingAcess, float ratingLimpeza, float ratingSeguranca, float ratingGeral) {
-        this.userPhotoId = userPhotoId;
+    public FeedEvaluationPost(String userPhotoUrl, String userName, String userType, String date, String placeName, float ratingInfra, float ratingAcess, float ratingLimpeza, float ratingSeguranca, float ratingGeral) {
+        this.userPhotoUrl = userPhotoUrl;
         this.userName = userName;
         this.userType = userType;
         this.date = date;
@@ -29,12 +29,12 @@ public class FeedEvaluationPost {
         this.ratingGeral = ratingGeral;
     }
 
-    public int getUserPhotoId() {
-        return userPhotoId;
+    public String getUserPhotoUrl() {
+        return userPhotoUrl;
     }
 
-    public void setUserPhotoId(int userPhotoId) {
-        this.userPhotoId = userPhotoId;
+    public void setUserPhotoUrl(String userPhotoUrl) {
+        this.userPhotoUrl = userPhotoUrl;
     }
 
     public String getUserName() {

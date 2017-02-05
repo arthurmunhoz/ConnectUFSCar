@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".ConnectApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@drawable/iconapp3"

@@ -14,6 +14,7 @@ import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.PUT;
+import retrofit.http.Path;
 
 /**
  * Created by Arthur on 16/01/2017.
@@ -22,7 +23,8 @@ import retrofit.http.PUT;
 // Interface criada para ter todas as chamadas do backend
 public interface ConnectUFSCarApi {
 
-    String BASE_URL = "http://138.197.20.132:8000/";
+    //String BASE_URL = "http://138.197.20.132:8000/";
+    String BASE_URL = "http://138.68.224.140:8000/";
 
     Retrofit RETROFIT = new Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -46,6 +48,12 @@ public interface ConnectUFSCarApi {
     //USUARIOS - UPDATE : PUT
     @PUT("users/update")
     Call<User> usersUpdate(@Body User user);
+
+    @GET("users")
+    Call<List<User>> getUsers();
+
+    @GET("users/{id}")
+    Call<User> getUser(@Path("id") String userId);
 
     //------------------------------------------------------------------------
     //DENUNCIAS - CREATE : POST

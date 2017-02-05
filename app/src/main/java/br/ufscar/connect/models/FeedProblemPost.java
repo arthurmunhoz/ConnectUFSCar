@@ -11,18 +11,18 @@ public class FeedProblemPost {
     String address;
     String type;
     String description;
-    int publPhotoId;
-    int userPhotoId;
+    String photoUrl;
+    String userUrl;
 
-    public FeedProblemPost(String userName, String userType, String publDate, String address, String type, String description, int publPhotoId, int userPhotoId) {
+    public FeedProblemPost(String userName, String userType, String publDate, String address, String type, String description, String photoUrl, String userUrl) {
         this.userName = userName;
         this.userType = userType;
         this.publDate = publDate;
         this.address = address;
         this.type = type;
         this.description = description;
-        this.publPhotoId = publPhotoId;
-        this.userPhotoId = userPhotoId;
+        this.photoUrl = photoUrl;
+        this.userUrl = userUrl;
     }
 
     public String getUserName() {
@@ -73,19 +73,19 @@ public class FeedProblemPost {
         this.description = description;
     }
 
-    public int getPublPhotoId() {
-        return publPhotoId;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPublPhotoId(int publPhotoId) {
-        this.publPhotoId = publPhotoId;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
-    public int getUserPhotoId() {
-        return userPhotoId;
+    public String getUserUrl() {
+        return userUrl;
     }
 
-    public void setUserPhotoId(int userPhotoId) {
-        this.userPhotoId = userPhotoId;
+    public void setUserUrl(String userUrl) {
+        this.userUrl = userUrl;
     }
 }

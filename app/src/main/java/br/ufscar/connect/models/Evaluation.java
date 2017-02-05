@@ -7,30 +7,51 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Evaluation  {
 
-    //Declarando atributos
-    @SerializedName("infra")
-    private float Infra;
-    @SerializedName("limpeza")
-    private float Limp;
-    @SerializedName("acess")
-    private float Acess;
-    @SerializedName("seg")
-    private float Seg;
-    @SerializedName("geral")
-    private float Geral;
+    @SerializedName("user_id")
+    private String userId;
     @SerializedName("placename")
     private String espaco;
     @SerializedName("created_at")
     private String date;
+    @SerializedName("infra")
+    private float infra;
+    @SerializedName("limpeza")
+    private float limp;
+    @SerializedName("acess")
+    private float acess;
+    @SerializedName("seg")
+    private float seg;
+    @SerializedName("geral")
+    private float geral;
 
-    //Construtor
-    public void Evaluation(float infra, float limp, float acess, float seg, float geral, String espaco, String date) {
+    public Evaluation() {
+    }
 
-        this.Infra = infra;
-        this.Limp = limp;
-        this.Acess = acess;
-        this.Seg = seg;
-        this.Geral = geral;
+    public Evaluation(String userId, String espaco, String date, float infra, float limp, float acess, float seg, float geral) {
+        this.userId = userId;
+        this.espaco = espaco;
+        this.date = date;
+        this.infra = infra;
+        this.limp = limp;
+        this.acess = acess;
+        this.seg = seg;
+        this.geral = geral;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getEspaco() {
+        return espaco;
+    }
+
+    public void setEspaco(String espaco) {
+        this.espaco = espaco;
     }
 
     public String getDate() {
@@ -41,55 +62,43 @@ public class Evaluation  {
         this.date = date;
     }
 
-    //Construtor vazio
-    public void Evaluation() {
-    }
-
     public float getInfra() {
-        return Infra;
+        return infra;
     }
 
     public void setInfra(float infra) {
-        this.Infra = infra;
+        this.infra = infra;
     }
 
     public float getLimp() {
-        return Limp;
+        return limp;
     }
 
     public void setLimp(float limp) {
-        this.Limp = limp;
-    }
-
-    public float getGeral() {
-        return Geral;
-    }
-
-    public void setGeral(float geral) {
-        this.Geral = geral;
+        this.limp = limp;
     }
 
     public float getAcess() {
-        return Acess;
+        return acess;
     }
 
     public void setAcess(float acess) {
-        this.Acess = acess;
+        this.acess = acess;
     }
 
     public float getSeg() {
-        return Seg;
+        return seg;
     }
 
     public void setSeg(float seg) {
-        this.Seg = seg;
+        this.seg = seg;
     }
 
-    public String getEspaco() {
-        return espaco;
+    public float getGeral() {
+        return geral;
     }
 
-    public void setEspaco(String espaco) {
-        this.espaco = espaco;
+    public void setGeral(float geral) {
+        this.geral = geral;
     }
 }

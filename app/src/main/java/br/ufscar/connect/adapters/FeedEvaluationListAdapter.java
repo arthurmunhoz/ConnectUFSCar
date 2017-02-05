@@ -1,6 +1,9 @@
 package br.ufscar.connect.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import br.ufscar.connect.R;
@@ -30,13 +35,13 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        FeedEvaluationPost post = getItem(position);
+        final FeedEvaluationPost post = getItem(position);
         
         if (convertView == null){
             convertView = LayoutInflater.from(getContext()).inflate(layoutId, parent, false);
         }
 
-        ImageView ivUserPhoto = (ImageView) convertView.findViewById(R.id.iv_user_photo);
+        final ImageView ivUserPhoto = (ImageView) convertView.findViewById(R.id.iv_user_photo);
         TextView tvUserName = (TextView) convertView.findViewById(R.id.tv_name);
         TextView tvUserType = (TextView) convertView.findViewById(R.id.tv_user_type);
         TextView tvDate = (TextView) convertView.findViewById(R.id.tv_date);
@@ -47,7 +52,6 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
         RatingBar rbSeg = (RatingBar) convertView.findViewById(R.id.rb_seg);
         RatingBar rbGeral = (RatingBar) convertView.findViewById(R.id.rb_geral);
 
-        ivUserPhoto.setImageResource(post.getUserPhotoId());
         tvUserName.setText(post.getUserName());
         tvUserType.setText(post.getUserType());
         tvDate.setText(post.getDate());
@@ -57,6 +61,32 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
         rbLimpeza.setRating(post.getRatingLimpeza());
         rbSeg.setRating(post.getRatingSeguranca());
         rbGeral.setRating(post.getRatingGeral());
+
+        AsyncTask a = new AsyncTask<Object, Void, Void>(){
+            Bitmap userPhoto;
+
+            @Override
+            protected Void doInBackground(Object... params) {
+                try {
+                    userPhoto = BitmapFactory.decodeStream(new URL(post.getUserPhotoUrl()).openConnection().getInputStream());
+                } catch (IOException e) {
+                    userPhoto = null;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (userPhoto != null)
+                    ivUserPhoto.setImageBitmap(userPhoto);
+                else
+                    ivUserPhoto.setImageResource(R.drawable.user);
+                return;
+            }
+        };
+
+        a.execute();
 
         return convertView;
     }

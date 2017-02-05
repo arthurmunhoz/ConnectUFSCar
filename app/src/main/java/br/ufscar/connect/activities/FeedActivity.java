@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,23 +18,29 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.adapters.FeedEvaluationListAdapter;
 import br.ufscar.connect.adapters.FeedProblemListAdapter;
+import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import br.ufscar.connect.models.Evaluation;
 import br.ufscar.connect.models.FeedEvaluationPost;
 import br.ufscar.connect.models.FeedProblemPost;
 import br.ufscar.connect.models.Report;
 import br.ufscar.connect.R;
+import br.ufscar.connect.models.User;
 
 
 public class FeedActivity extends Activity {
+    private static List<FeedProblemPost> feedProblemPostList;
+    private static List<FeedEvaluationPost> feedEvaluationPostList;
 
     //-------------------------------------------------
     //Declarando variaveis
-
-    Report report;
 
     View cv_separator;
 
@@ -56,6 +63,7 @@ public class FeedActivity extends Activity {
     FeedEvaluationListAdapter evaluationListAdapter;
     FeedProblemListAdapter problemListAdapter;
 
+    ConnectUFSCarApi api;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,6 +114,18 @@ public class FeedActivity extends Activity {
         setContentView(R.layout.activity_feed);
         context = this;
 
+        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+
+        AsyncTask task = getLoadingPublTask();
+        try {
+            task.execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
         //Referencia as variáveis aos objetos do XML
         cv_separator = (View) findViewById(R.id.cv_separator);
 
@@ -124,32 +144,15 @@ public class FeedActivity extends Activity {
 
         lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
 
-        //Declarando arrays para dados das publicações
-        //Publicações de problemas
-        List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
 
-        feedProblemPostList.add(new FeedProblemPost("Arthur Regatieri Munhoz", "Aluno de Graduação", "27/11/2016", "Rua da Praça da Bandeira, 1500",
-                "Danos ao Patrimônio", "Carros danificaram a grama da praça pois estavam estacionados em local indevido.",
-                R.drawable.danosgramado, R.drawable.perfilphoto));
-        feedProblemPostList.add(new FeedProblemPost("Breno Calixto", "Aluno de Graduação", "30/11/2016", "Rua Biblioteca Comunitária, 123",
-                "Vazamento D'água", "Há um cano quebrado que está vazando muita água!",
-                R.drawable.vazamentoagua, R.drawable.perfilphoto2));
-        feedProblemPostList.add(new FeedProblemPost("Guiherme MMuniz Cardoso", "Aluno de Graduação", "01/12/2016", "Rua dos Ypês, 345",
-                "Rede Eletrica", "Há um poste de energia danificado pela chuva que apresenta cabos desencapados e oferece perigo aos pedestres que ali passam.",
-                R.drawable.redeeletrica, R.drawable.perfilphoto3));
-        feedProblemPostList.add(new FeedProblemPost("Marco Alexandre Andrade", "Aluno de Graduação", "22/11/2016", "Rua Biblioteca Comunitária, 65",
-                "Vazamento D'agua", "Tubulacao da caixa d'água se encontra estourada",
-                R.drawable.caixadaguavazando, R.drawable.perfilphoto4));
-
-        //Publicações de Avaliações
-        List<FeedEvaluationPost> feedEvaluationPostList = new ArrayList<>();
-        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto, "Arthur Regatieri Munhoz", "Aluno de Graduação", "02/02/2017",
-                "Departamento de Computação", (float)4.5, (float)4.0, (float)3.5, (float)4.0, (float)4.0));
-        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto2, "Breno Calixto", "Aluno de Graduação", "04/02/2017",
-                "Departamento de Matemática", 3.0f, 3.0f, 4.5f, 5.0f, 2.0f));
-        feedEvaluationPostList.add(new FeedEvaluationPost(R.drawable.perfilphoto4, "Marco Alexandre Andrade", "Aluno de Graduação", "04/02/2017",
-                "Departamento de QualquerCoisa", 5.0f, 5.0f, 5.0f, 5.0f, 5.0f));
-
+        // FIXME: péssima gambiarra abaixo. Fica aguardando a task carregar as listas
+        while (this.feedEvaluationPostList == null || this.feedProblemPostList == null){
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         this.evaluationListAdapter = new FeedEvaluationListAdapter(this, feedEvaluationPostList);
         this.problemListAdapter = new FeedProblemListAdapter(this, feedProblemPostList);
@@ -219,4 +222,56 @@ public class FeedActivity extends Activity {
         alertDialog.show();
     }
 
+
+    public AsyncTask getLoadingPublTask() {
+        final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
+
+        return new AsyncTask() {
+            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+            List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
+            public boolean finished = false;
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                try {
+                    List<Report> reportList = api.reportList().execute().body();
+
+                    for (Report r : reportList) {
+                        User user = api.getUser(r.getUser_id()).execute().body();
+                        if (user != null) {
+                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
+                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
+                                    r.getProblemPhoto(), user.getUser_photo());
+                            feedProblemPostList.add(post);
+                        }
+                    }
+
+                    List<Evaluation> evaluationList = api.evaluationList().execute().body();
+
+                    for (Evaluation e : evaluationList) {
+                        User user = api.getUser(e.getUserId()).execute().body();
+                        if (user != null) {
+                            FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
+                                    user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
+                                    e.getLimp(), e.getSeg(), e.getGeral());
+
+                            feedEvaluationPost.add(post);
+                        }
+                    }
+                    // FIXME: as duas linhas a baixo deviam estar no onPostExecute, mas por algum motivo ele nao tá sendo chamado nunca...
+                    FeedActivity.feedProblemPostList = feedProblemPostList;
+                    FeedActivity.feedEvaluationPostList = feedEvaluationPost;
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+            }
+        };
+    }
 }
