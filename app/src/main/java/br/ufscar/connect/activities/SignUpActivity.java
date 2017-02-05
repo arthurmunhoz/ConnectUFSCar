@@ -436,6 +436,16 @@ public class SignUpActivity extends Activity {
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
 
+                        //Salva os dados do usuario em SharedPreferences para uso em outras activites
+                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("name", user.getName()).apply();
+                        editor.putString("lastname", user.getLast_name()).apply();
+                        editor.putString("email", user.getEmail()).apply();
+                        editor.putString("usertype", user.getUser_type()).apply();
+                        editor.putString("image_url", user.getUser_photo()).apply();
+                        editor.putString("username", user.getUsername()).apply();
+
                         //Inicia o aplicativo
                         Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
                         startActivity(i);
