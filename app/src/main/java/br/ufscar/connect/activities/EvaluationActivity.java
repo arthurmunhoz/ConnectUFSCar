@@ -12,6 +12,7 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.Evaluation;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -42,7 +43,7 @@ public class EvaluationActivity extends Activity {
 
         //-------------------------------------------------------
         //Inicializando API
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
 
         //Referenciando objetos do xml
         spinner_espacos = (Spinner) findViewById(R.id.spinnerEspaco);

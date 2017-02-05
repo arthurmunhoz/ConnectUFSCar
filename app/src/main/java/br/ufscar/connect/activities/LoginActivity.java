@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.User;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -47,7 +48,7 @@ public class LoginActivity extends Activity {
         et_password = (EditText) findViewById(R.id.et_password);
         btn_login = (Button) findViewById(R.id.btn_login);
 
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
     }
 
     public void onButtonClick(View v) {

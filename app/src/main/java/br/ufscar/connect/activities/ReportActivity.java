@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.Report;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -176,7 +177,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
         //-------------------------------------------------------
         //Inicializando API
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
 
     }
 

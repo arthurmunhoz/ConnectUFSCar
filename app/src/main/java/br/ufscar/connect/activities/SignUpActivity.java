@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.User;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -167,7 +168,7 @@ public class SignUpActivity extends Activity {
         setContentView(R.layout.activity_sign_up);
 
         //Inicializando API
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
 
         //Configuracoes do spinner para selecao de curso
         et_user_type = (Spinner) findViewById(R.id.spinnerTipos);

@@ -114,7 +114,7 @@ public class FeedActivity extends Activity {
         setContentView(R.layout.activity_feed);
         context = this;
 
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
 
         AsyncTask task = getLoadingPublTask();
         try {

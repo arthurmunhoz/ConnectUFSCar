@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.User;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -157,7 +158,7 @@ public class EditProfileActivity extends Activity {
         setContentView(R.layout.activity_edit_profile);
 
         //Inicializando API
-        api = ConnectUFSCarApi.RETROFIT.create(ConnectUFSCarApi.class);
+        api = ((ConnectApplication) getApplication()).getApi();
 
         //Initializing fragments of the xml
         btn_concluido = (Button) findViewById(R.id.btn_concluido);
