@@ -58,7 +58,6 @@ public class LoginActivity extends Activity {
         if (v.getId() == R.id.tv_cadastrese) {
             Intent i = new Intent(this, SignUpActivity.class);
             startActivity(i);
-
         }
 
         //------------------------------------------------------------------------------------------
@@ -85,11 +84,6 @@ public class LoginActivity extends Activity {
             }
 
             new upToDB().execute();
-
-            Intent i = new Intent(this, MenuActivity.class);
-            startActivity(i);
-            this.finish();
-
         }// end of btn_entrar click
 
 
@@ -160,7 +154,7 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onResponse(Response<User> response, Retrofit retrofit) {
                     //Se o servidor retornou com sucesso
-                    if (response.isSuccess()) {
+                    if (response.isSuccess() && response.code() == 200) {
                         // Exibe mensagem de sucesso
                         Toast.makeText(c, "BEM VINDO(A), " + response.body().getName() + "!", Toast.LENGTH_LONG).show();
 
@@ -175,13 +169,12 @@ public class LoginActivity extends Activity {
                         editor.putString("image_url", response.body().getUser_photo()).apply();
                         editor.putString("username", response.body().getUsername()).apply();
 
+                        Intent i = new Intent(LoginActivity.this, MenuActivity.class);
+                        startActivity(i);
+                        return;
                     } else {
-                        try {
-                            String error = response.errorBody().string();
-                            Toast.makeText(c, error, Toast.LENGTH_SHORT).show();
-                        } catch (IOException e) {
-                            Log.e("ERROR TAG", e.getMessage(), e);
-                        }
+                        String error = "Não foi possível fazer login";
+                        Toast.makeText(c, error, Toast.LENGTH_SHORT).show();
                     }
                 }
 
