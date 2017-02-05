@@ -116,7 +116,7 @@ public class FeedActivity extends Activity {
 
         api = ((ConnectApplication) getApplication()).getApi();
 
-        AsyncTask task = getLoadingPublTask();
+        AsyncTask task = loadPublicationsTask();
         try {
             task.execute().get();
         } catch (InterruptedException e) {
@@ -223,13 +223,12 @@ public class FeedActivity extends Activity {
     }
 
 
-    public AsyncTask getLoadingPublTask() {
+    public AsyncTask loadPublicationsTask() {
         final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
 
         return new AsyncTask() {
             List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
             List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
-            public boolean finished = false;
 
             @Override
             protected Object doInBackground(Object[] params) {
