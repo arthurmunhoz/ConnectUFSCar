@@ -23,8 +23,7 @@ import retrofit.http.Path;
 // Interface criada para ter todas as chamadas do backend
 public interface ConnectUFSCarApi {
 
-    //String BASE_URL = "http://138.197.20.132:8000/";
-    String BASE_URL = "http://138.68.224.140:8000/";
+    String BASE_URL = "http://138.68.232.191:8000/";
 
     Retrofit RETROFIT = new Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
