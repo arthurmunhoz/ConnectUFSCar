@@ -1,6 +1,7 @@
 package br.ufscar.connect.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,16 +47,12 @@ public class ProfileActivity extends Activity {
     ImageButton btn_edit_profile;
     TextView tv_username;
     String USER_NAME, USER_LASTNAME, USER_EMAIL, USER_TYPE, USER_USERNAME, USER_PHOTO, USER_ID;
-    private static String userId;
-    private static List<FeedProblemPost> feedProblemPostList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         context = this;
-
-       loadPublicationsTask().execute();
 
         //----------------------------------------------------------------------------------------
         //Referenciando os objetos do XML
@@ -68,10 +65,6 @@ public class ProfileActivity extends Activity {
         tv_my_publications = (TextView) findViewById(R.id.tv_titlemypublications);
         btn_edit_profile = (ImageButton) findViewById(R.id.btn_edit_profile);
         infosProfile = (RelativeLayout) findViewById(R.id.InfosProfile);
-    }
-
-    public void onResume() {
-        super.onResume();
 
         //----------------------------------------------------------------------------------------
         //Recebe os dados do usuario de USER_PREFERENCES
@@ -83,14 +76,13 @@ public class ProfileActivity extends Activity {
         USER_USERNAME = sharedPref.getString("username", "");
         USER_TYPE = sharedPref.getString("usertype", "");
         USER_PHOTO = sharedPref.getString("image_url", "");
-        userId = USER_ID;
 
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
         iv_profile_pic.setVisibility(View.VISIBLE);
 
         if (USER_PHOTO != null && !USER_PHOTO.equals("")) {
-            Picasso.Builder builder = new Picasso.Builder(this);
+            Picasso.Builder builder = new Picasso.Builder(ProfileActivity.this);
             builder.listener(new Picasso.Listener() {
                 @Override
                 public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
@@ -105,16 +97,44 @@ public class ProfileActivity extends Activity {
         tv_useremail.setText(USER_EMAIL); //completa o TextView com o email do usuario
         tv_username.setText(USER_USERNAME);
 
-        // FIXME: péssima gambiarra abaixo. Fica aguardando a task carregar as listas
-        while (this.feedProblemPostList == null){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        final ProgressDialog progressDialog = new ProgressDialog(ProfileActivity.this);
+        progressDialog.setMessage("Carregando minhas publicações");
+        progressDialog.show();
 
-        lv_my_publications.setAdapter(new FeedProblemListAdapter(this, feedProblemPostList));
+        AsyncTask task = new AsyncTask() {
+            final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
+            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                try {
+                    List<Report> reportList = api.reportList().execute().body();
+                    User user = api.getUser(USER_ID).execute().body();
+
+                    for (Report r : reportList) {
+                        if (r.getUser_id().equals(USER_ID)) {
+                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
+                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
+                                    r.getProblemPhoto(), user.getUser_photo());
+                            feedProblemPostList.add(post);
+                        }
+                    }
+
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                lv_my_publications.setAdapter(new FeedProblemListAdapter(ProfileActivity.this, feedProblemPostList));
+                progressDialog.hide();
+            }
+        };
+
+        task.execute();
     }
 
     @Override
@@ -199,42 +219,5 @@ public class ProfileActivity extends Activity {
         Intent i = new Intent(ProfileActivity.this, MenuActivity.class);
         startActivity(i);
         finish(); //termina a atividade liberando memória
-    }
-
-
-    public AsyncTask loadPublicationsTask() {
-        final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
-
-        return new AsyncTask() {
-            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-                try {
-                    List<Report> reportList = api.reportList().execute().body();
-                    User user = api.getUser(ProfileActivity.userId).execute().body();
-
-                    for (Report r : reportList) {
-                        if (r.getUser_id().equals(ProfileActivity.userId)) {
-                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
-                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
-                                    r.getProblemPhoto(), user.getUser_photo());
-                            feedProblemPostList.add(post);
-                        }
-                    }
-                    // FIXME: as duas linhas a baixo deviam estar no onPostExecute, mas por algum motivo ele nao tá sendo chamado nunca...
-                    ProfileActivity.feedProblemPostList = feedProblemPostList;
-                    return null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-            }
-        };
     }
 }
