@@ -3,6 +3,12 @@ package br.ufscar.connect.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -14,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.bitmap.Transform;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -72,7 +80,26 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
 
             @Override
             protected Void doInBackground(Object... params) {
+                /*
+                Ion.with(getContext())
+                        .load(post.getUserUrl())
+                        .withBitmap()
+                        .transform(new Transform() {
+                            @Override
+                            public Bitmap transform(Bitmap bitmap) {
+                                return createCircleBitmap(userPhoto);
+                            }
+
+                            @Override
+                            public String key() {
+                                return null;
+                            }
+                        })
+                        .placeholder(R.drawable.usericon2)
+                        .intoImageView(ivUserPhoto);
+                */
                 try {
+
                     userPhoto = BitmapFactory.decodeStream(new URL(post.getUserUrl()).openConnection().getInputStream());
                     userPhotoUri = getImageUri(getContext(), userPhoto);
 
@@ -88,6 +115,7 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
                 } catch (IOException e) {
                     problemPhoto = null;
                 }
+
                 return null;
             }
 
@@ -125,7 +153,6 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
                 else
                     ivPublPhoto.setImageResource(R.drawable.danosgramado);
 
-                return;
             }
         };
 
@@ -157,6 +184,23 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+    public static Bitmap createCircleBitmap(Bitmap bitmap){
+
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
+                Bitmap.Config.ARGB_8888);
+
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        Canvas canvas = new Canvas(output);
+        final Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        int halfWidth = bitmap.getWidth()/2;
+        int halfHeight = bitmap.getHeight()/2;
+        canvas.drawCircle(halfWidth, halfHeight, Math.max(halfWidth, halfHeight), paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
     }
 
 

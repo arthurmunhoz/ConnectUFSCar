@@ -85,9 +85,6 @@ public class LoginActivity extends Activity {
 
             new upToDB().execute();
 
-            Intent i = new Intent(LoginActivity.this, MenuActivity.class);
-            startActivity(i);
-
             this.finish();
         }// end of btn_entrar click
 
@@ -174,6 +171,10 @@ public class LoginActivity extends Activity {
                         editor.putString("image_url", response.body().getUser_photo()).apply();
                         editor.putString("username", response.body().getUsername()).apply();
                         editor.putString("problem_photo", "").apply();
+
+                        Intent i = new Intent(LoginActivity.this, MenuActivity.class);
+                        startActivity(i);
+                        finish();
 
                     } else {
                         String error = "Não foi possível fazer login";

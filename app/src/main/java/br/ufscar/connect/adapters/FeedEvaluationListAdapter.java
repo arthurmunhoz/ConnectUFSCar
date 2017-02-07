@@ -104,7 +104,6 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
                 }
                 else
                     ivUserPhoto.setImageResource(R.drawable.user);
-                return;
             }
         };
 
