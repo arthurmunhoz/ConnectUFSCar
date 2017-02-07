@@ -62,22 +62,11 @@ import retrofit.Retrofit;
 @SuppressWarnings("ALL")
 public class SignUpActivity extends Activity {
 
-    //---------------------------------------------
-    // Declarando variaveis
-    File imageFile;
-
-    RequestQueue requestQueue;
-
-    Spinner et_user_type, spinner; //spinner para selecao de curso
-
-    StringRequest stringRequest;
-
-    User user = new User();
-
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
-
+    //---------------------------------------------
+    // Declarando variaveis
     Map resultMap = new Map() {
         @Override
         public int size() {
@@ -142,23 +131,19 @@ public class SignUpActivity extends Activity {
             return null;
         }
     }, config;
-
+    File imageFile;
+    RequestQueue requestQueue;
+    Spinner et_user_type, spinner; //spinner para selecao de curso
+    StringRequest stringRequest;
+    User user = new User();
     Cloudinary mobileCloudinary;
-
     Bitmap cameraImage, cameraImageResized;
-
     String user_type, username, name, last_name, email, password, password_conf, image_url, imageURL, imagePath;
-
     ImageView iv_profile_pic;
-
     TextView tv_changePicture;
-
     EditText et_username, et_name, et_last_name, et_email, et_password, et_password_conf;
-
     ArrayAdapter<CharSequence> adapter; //adapter para spinner
-
     Uri imageUri = null;
-
     private ConnectUFSCarApi api;
 
 
@@ -179,20 +164,13 @@ public class SignUpActivity extends Activity {
         //---------------------------------------------------------
         //Refereciando os objetos do XML
         et_username = (EditText) findViewById(R.id.tv_username);
-
         et_name = (EditText) findViewById(R.id.et_name);
-
         et_last_name = (EditText) findViewById(R.id.et_last_name);
-
         et_email = (EditText) findViewById(R.id.et_username);
-
         et_password = (EditText) findViewById(R.id.et_password);
-
         et_password_conf = (EditText) findViewById(R.id.et_password_conf);
-
         iv_profile_pic = (ImageView) findViewById(R.id.iv_profile_picture);
         iv_profile_pic.setImageResource(R.drawable.usericon2);
-
     }
 
     public void onButtonClick(View v) {
@@ -204,106 +182,16 @@ public class SignUpActivity extends Activity {
 
             //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                    //Storage Permission already granted, do what we need
-                    final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-                    builder.setTitle("Altere sua foto!");
-                    builder.setItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int item) {
-
-                            if (items[item].equals("Tire uma foto")) {
-
-                                Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(i, REQUEST_CAMERA);
-
-                            } else if (items[item].equals("Escolha da galeria")) {
-
-                                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(i, SELECT_FILE);
-
-                            } else if (items[item].equals("Cancelar")) {
-                                dialog.dismiss();
-                            }
-                        }
-                    });
-                    builder.show();
-
+                //Request STORAGE Permission
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestStoragePermission();
                 } else {
-
-                    //Request STORAGE Permission
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                        // Show an explanation to the user *asynchronously* -- don't block
-                        // this thread waiting for the user's response! After the user
-                        // sees the explanation, try again to request the permission.
-                        new AlertDialog.Builder(this)
-                                .setTitle("Permissão necessária")
-                                .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
-                                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
-                                        Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                                    public static final int REQUEST_PERMISSION_SETTING = 1;
-
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        //Prompt the user once explanation has been shown
-                                        ActivityCompat.requestPermissions(SignUpActivity.this,
-                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                                MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-
-                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                        intent.setData(uri);
-                                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-                                    }
-                                })
-                                .create()
-                                .show();
-
-                    } else {
-                        // No explanation needed, we can request the permission.
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-                    }
+                    // No explanation needed, we can request the permission.
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
                 }
             } else {
-                //Storage Permission already granted
-                final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-                builder.setTitle("Altere sua foto!");
-                builder.setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int item) {
-
-                        if (items[item].equals("Tire uma foto")) {
-
-                            Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(i, REQUEST_CAMERA);
-
-                        } else if (items[item].equals("Escolha da galeria")) {
-
-                            Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            startActivityForResult(i, SELECT_FILE);
-
-                        } else if (items[item].equals("Cancelar")) {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-                builder.show();
+                goToPhotoDialog();
             }
-
             return;
         }
 
@@ -323,104 +211,13 @@ public class SignUpActivity extends Activity {
             //-------------------- VERIFICACOES DE ERROS ----------------------
 
             //Se o usuario nao digitar nada em em algum dos campos, recebe uma mensagem de erro
-            if (user.getUsername().length() == 0) {
-                et_username.setError("Digite um Nome de Usuário");
-                return;
-            }
-            if (user.getName().length() == 0) {
-                et_name.setError("Digite seu nome");
-                return;
-            }
-            if (user.getLast_name().length() == 0) {
-                et_last_name.setError("Digite seu sobrenome");
-                return;
-            }
-            if (user.getPassword().length() == 0) {
-                et_password.setError("Digite uma senha");
-                return;
-            }
-            if (user.getEmail().length() == 0) {
-                et_email.setError("Digite seu e-mail");
-                return;
-            }
-            if (et_password_conf.getText().length() == 0) {
-                et_password_conf.setError("Confirme sua senha");
-                return;
-            }
-
-            //Se o usuario nao selecionar o tipo de usuario, exibe mensagem de erro
-            String tipo = et_user_type.getSelectedItem().toString();
-            if (tipo.contentEquals("Selecione o tipo de usuário")) {
-                Toast.makeText(getApplicationContext(), "Por favor, selecione um tipo de usuário.", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            //Se Senha e a confirmacao de senha nao forem iguais, exibe mensagem ao usuario
-            if (password_conf.equals(user.getPassword()) == false) {
-                Toast.makeText(getApplicationContext(), "SENHA e CONFIRMAÇÃO DE SENHA não conferem, por favor verifique.", Toast.LENGTH_LONG).show();
-                return;
-            }
+            if (!allFieldsValid()) ;
             // end of VERIFICACAO DE ERROS
 
             //Salva os dados do usuario em SharedPreferences para uso em outras activites
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("image_url", imageURL).apply();
-
-            //--------------- REALIZANDO A POST REQUEST PARA SALVAR OS DADOS DO USUARIO NO BD ---------------
-            /*
-            //---- Request usaing VOLLEY ----
-            stringRequest = new StringRequest(Request.Method.POST, USER_CREATE_URL,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Toast.makeText(SignUpActivity.this,response,Toast.LENGTH_LONG).show();
-                            Log.d("Response", response);
-
-
-                            // Exibe mensagem de sucesso
-                            Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
-                            Log.d("Error.Response", response);
-
-                            //Inicia o aplicativo
-                            Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
-                            startActivity(i);
-                            finish();
-
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                            if(error!=null && error.getMessage() !=null){
-                                Toast.makeText(getApplicationContext(),"error VOLLEY "+error.getMessage(),Toast.LENGTH_LONG).show();
-                            }
-                            else{
-                                Toast.makeText(getApplicationContext(),"Something went wrong",Toast.LENGTH_LONG).show();
-
-                            }
-                        }
-                    }) {
-
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(username,    user.getUsername());
-                    params.put(name,        user.getName());
-                    params.put(image_url,   user.getUser_photo());
-                    params.put(password,    user.getPassword());
-                    params.put(user_type,   user.getUser_type());
-                    params.put(email,       user.getEmail());
-                    params.put(last_name,   user.getLast_name());
-                    return params;
-                }
-            };
-
-            requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-            */
-
 
             //---- Request using RETROFIT ----
             // Prepare the HTTP request
@@ -431,7 +228,7 @@ public class SignUpActivity extends Activity {
                 public void onResponse(Response<User> response, Retrofit retrofit) {
 
                     //Se o servidor retornou com sucesso
-                    if (response.isSuccess()) {
+                    if (response.isSuccess() && response.code() == 200) {
 
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
@@ -447,38 +244,23 @@ public class SignUpActivity extends Activity {
                         editor.putString("username", user.getUsername()).apply();
 
                         //Inicia o aplicativo
-                        Intent i = new Intent(SignUpActivity.this, MenuActivity.class);
-                        startActivity(i);
+                        startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                         finish();
 
                     } else {
-                        try {
-                            String error = response.errorBody().string();
-                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
-
-                        } catch (IOException e) {
-                            Log.e("ERROR TAG", e.getMessage(), e);
-                        }
-
-                        Toast.makeText(getApplicationContext(), "Falha de conexão: !response.isSuccess", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Erro ao criar usuário", Toast.LENGTH_LONG).show();
+                        Log.e("ERROR_FAILURE: ", response.code() + " Message: " + response.message());
                     }
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
                     Log.e("ERROR_FAILURE: ", t.getMessage());
-                    Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!**", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
+                    Toast.makeText(getApplicationContext(), "Erro ao criar usuário", Toast.LENGTH_LONG).show();
                 }
-
             });
-
-
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -517,126 +299,13 @@ public class SignUpActivity extends Activity {
         //Se escolheu pegar uma imagem da galeria, a galeria é apresentada e a foto escolhida é atualizada na UI
         if (resultCode != RESULT_CANCELED) {
             if (resultCode == RESULT_OK) {
-
                 switch (requestCode) {
-
                     case REQUEST_CAMERA:
-
-                        //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
-                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                                //Storage Permission already granted, do what we need
-
-                                //Imagem capturada salva na variavel imageUri(Uri)
-                                imageUri = data.getData();
-                                cameraImage = (Bitmap) data.getExtras().get("data");
-                                //Fazendo upload da imagem para Cloudinary
-                                new upToCloud().execute();
-
-                                Picasso.Builder builder = new Picasso.Builder(this);
-                                builder.listener(new Picasso.Listener() {
-                                    @Override
-                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                        exception.printStackTrace();
-                                    }
-                                });
-                                builder.build().load(imageUri)
-                                        .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                                        .transform(new CropCircleTransformation())
-                                        .into(iv_profile_pic);
-
-                            } else {
-
-                                //Request STORAGE Permission
-                                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                                    // Show an explanation to the user *asynchronously* -- don't block
-                                    // this thread waiting for the user's response! After the user
-                                    // sees the explanation, try again to request the permission.
-                                    new AlertDialog.Builder(this)
-                                            .setTitle("Permissão necessária")
-                                            .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
-                                            .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
-                                                    Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
-                                                }
-                                            })
-
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                                                public static final int REQUEST_PERMISSION_SETTING = 1;
-
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    //Prompt the user once explanation has been shown
-                                                    ActivityCompat.requestPermissions(SignUpActivity.this,
-                                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                                            MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-
-                                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                                    intent.setData(uri);
-                                                    startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-                                                }
-                                            })
-                                            .create()
-                                            .show();
-
-                                } else {
-                                    // No explanation needed, we can request the permission.
-                                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-                                }
-
-                            }
-                        } else {
-                            //Storage Permission already granted
-                            //Colocando e ajustando a imagem na UI
-                            iv_profile_pic.setBackground(null);
-                            iv_profile_pic.setVisibility(View.VISIBLE);
-                            Picasso.Builder builder = new Picasso.Builder(this);
-                            builder.listener(new Picasso.Listener() {
-                                @Override
-                                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                    exception.printStackTrace();
-                                }
-                            });
-                            builder.build().load(imageUri)
-                                    .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                                    .transform(new CropCircleTransformation())
-                                    .into(iv_profile_pic);
-                        }
-
+                        uploadFromCamera(data);
+                        return;
                     case SELECT_FILE:
-
-                        Bundle bundle = getIntent().getExtras();
-                        if (bundle != null) {// to avoid the NullPointerException
-                            cameraImage = (Bitmap) data.getExtras().get("data");
-                            Toast.makeText(getApplicationContext(), imageUri.toString(), Toast.LENGTH_LONG).show();
-                        }
-
-                        imageUri = data.getData();
-
-                        new upToCloud().execute();
-
-                        //Colocando e ajustando a imagem na UI
-                        iv_profile_pic.setVisibility(View.VISIBLE);
-
-                        Picasso.Builder builder = new Picasso.Builder(SignUpActivity.this);
-                        builder.listener(new Picasso.Listener() {
-                            @Override
-                            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                exception.printStackTrace();
-                            }
-                        });
-
-                        builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
-
-                }//end of switch
+                        uploadFromFile(data);
+                }
             }
         }
     }
@@ -662,6 +331,228 @@ public class SignUpActivity extends Activity {
             builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
         }
 
+    }
+
+
+    private void goToPhotoDialog() {
+        //Storage Permission already granted, do what we need
+        final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Altere sua foto!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (items[item].equals("Tire uma foto")) {
+                    Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(i, REQUEST_CAMERA);
+
+                } else if (items[item].equals("Escolha da galeria")) {
+                    Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(i, SELECT_FILE);
+
+                } else if (items[item].equals("Cancelar")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void requestStoragePermission() {
+        // Show an explanation to the user *asynchronously* -- don't block
+        // this thread waiting for the user's response! After the user
+        // sees the explanation, try again to request the permission.
+        new AlertDialog.Builder(this)
+                .setTitle("Permissão necessária")
+                .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
+                        Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
+                    }
+                })
+
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                    public static final int REQUEST_PERMISSION_SETTING = 1;
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Prompt the user once explanation has been shown
+                        ActivityCompat.requestPermissions(SignUpActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+
+    private boolean allFieldsValid() {
+        if (user.getUsername().length() == 0) {
+            et_username.setError("Digite um Nome de Usuário");
+            return false;
+        }
+        if (user.getName().length() == 0) {
+            et_name.setError("Digite seu nome");
+            return false;
+        }
+        if (user.getLast_name().length() == 0) {
+            et_last_name.setError("Digite seu sobrenome");
+            return false;
+        }
+        if (user.getPassword().length() == 0) {
+            et_password.setError("Digite uma senha");
+            return false;
+        }
+        if (user.getEmail().length() == 0) {
+            et_email.setError("Digite seu e-mail");
+            return false;
+        }
+        if (et_password_conf.getText().length() == 0) {
+            et_password_conf.setError("Confirme sua senha");
+            return false;
+        }
+
+        //Se o usuario nao selecionar o tipo de usuario, exibe mensagem de erro
+        String tipo = et_user_type.getSelectedItem().toString();
+        if (tipo.contentEquals("Selecione o tipo de usuário")) {
+            Toast.makeText(getApplicationContext(), "Por favor, selecione um tipo de usuário.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        //Se Senha e a confirmacao de senha nao forem iguais, exibe mensagem ao usuario
+        if (password_conf.equals(user.getPassword()) == false) {
+            Toast.makeText(getApplicationContext(), "SENHA e CONFIRMAÇÃO DE SENHA não conferem, por favor verifique.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    private void uploadFromCamera(Intent data) {
+        //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+                //Storage Permission already granted, do what we need
+
+                //Imagem capturada salva na variavel imageUri(Uri)
+                imageUri = data.getData();
+                cameraImage = (Bitmap) data.getExtras().get("data");
+                //Fazendo upload da imagem para Cloudinary
+                new upToCloud().execute();
+
+                Picasso.Builder builder = new Picasso.Builder(this);
+                builder.listener(new Picasso.Listener() {
+                    @Override
+                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+                builder.build().load(imageUri)
+                        .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                        .transform(new CropCircleTransformation())
+                        .into(iv_profile_pic);
+
+            } else {
+
+                //Request STORAGE Permission
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                    new AlertDialog.Builder(this)
+                            .setTitle("Permissão necessária")
+                            .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
+                            .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
+                                    Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+                                public static final int REQUEST_PERMISSION_SETTING = 1;
+
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Prompt the user once explanation has been shown
+                                    ActivityCompat.requestPermissions(SignUpActivity.this,
+                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                    intent.setData(uri);
+                                    startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+
+                                }
+                            })
+                            .create()
+                            .show();
+
+                } else {
+                    // No explanation needed, we can request the permission.
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+                }
+
+            }
+        } else {
+            //Storage Permission already granted
+            //Colocando e ajustando a imagem na UI
+            iv_profile_pic.setBackground(null);
+            iv_profile_pic.setVisibility(View.VISIBLE);
+            Picasso.Builder builder = new Picasso.Builder(this);
+            builder.listener(new Picasso.Listener() {
+                @Override
+                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                    exception.printStackTrace();
+                }
+            });
+            builder.build().load(imageUri)
+                    .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                    .transform(new CropCircleTransformation())
+                    .into(iv_profile_pic);
+        }
+    }
+
+    private void uploadFromFile(Intent data) {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {// to avoid the NullPointerException
+            cameraImage = (Bitmap) data.getExtras().get("data");
+            Toast.makeText(getApplicationContext(), imageUri.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        imageUri = data.getData();
+
+        new upToCloud().execute();
+
+        //Colocando e ajustando a imagem na UI
+        iv_profile_pic.setVisibility(View.VISIBLE);
+
+        Picasso.Builder builder = new Picasso.Builder(SignUpActivity.this);
+        builder.listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+
+        builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
     }
 
     //Envia as fotos no formato Uri para o servidor Cloudinary
@@ -755,7 +646,7 @@ public class SignUpActivity extends Activity {
     // FUNCOES PARA MANIPULACAO DE IMAGENS   ------------------------------------------------------
 
     //Retorna o 'path' da imagem Uri em String
-    public String getPath(Uri uri) {
+    private String getPath(Uri uri) {
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = managedQuery(uri, projection, null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -764,7 +655,7 @@ public class SignUpActivity extends Activity {
     }
 
     //Retorna o 'path' de uma imagem Bitmap em Uri
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
+    private Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
@@ -772,7 +663,7 @@ public class SignUpActivity extends Activity {
     }
 
     //Reduz o tamanho de uma imagem Bitmap
-    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+    private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
         int width = image.getWidth();
         int height = image.getHeight();
 
