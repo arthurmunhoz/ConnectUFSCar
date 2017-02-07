@@ -199,9 +199,7 @@ public class SignUpActivity extends Activity {
         }
 
         //Se o usuario clicar no botao CONCLUIDO, exibe-se uma mensagem e retorna para a activity LoginActivity
-        if (v.getId() == R.id.btn_concluido)
-
-        {
+        if (v.getId() == R.id.btn_concluido) {
 
             //Recebendo texto inserido pelo usuario nos campos xml
             user.setUser_type(et_user_type.getSelectedItem().toString());
@@ -213,12 +211,9 @@ public class SignUpActivity extends Activity {
             password_conf = et_password_conf.getText() + "";
             user.setUser_photo(imageURL);
 
-            //-------------------- VERIFICACOES DE ERROS ----------------------
-
             //Se o usuario nao digitar nada em em algum dos campos, recebe uma mensagem de erro
             if (!allFieldsValid())
                 return;
-            // end of VERIFICACAO DE ERROS
 
             //Salva os dados do usuario em SharedPreferences para uso em outras activites
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -339,7 +334,6 @@ public class SignUpActivity extends Activity {
 
     }
 
-
     private void goToPhotoDialog() {
         //Storage Permission already granted, do what we need
         final CharSequence[] items = {"Tire uma foto", "Escolha da galeria", "Cancelar"};
@@ -364,45 +358,6 @@ public class SignUpActivity extends Activity {
         });
         builder.show();
     }
-
-    private void requestStoragePermission() {
-        // Show an explanation to the user *asynchronously* -- don't block
-        // this thread waiting for the user's response! After the user
-        // sees the explanation, try again to request the permission.
-        new AlertDialog.Builder(this)
-                .setTitle("Permissão necessária")
-                .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
-                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
-                        Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
-                    }
-                })
-
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                    public static final int REQUEST_PERMISSION_SETTING = 1;
-
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        //Prompt the user once explanation has been shown
-                        ActivityCompat.requestPermissions(SignUpActivity.this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                        intent.setData(uri);
-                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-                    }
-                })
-                .create()
-                .show();
-    }
-
 
     private boolean allFieldsValid() {
         if (user.getUsername().length() == 0) {
