@@ -52,6 +52,7 @@ import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.Report;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
@@ -248,7 +249,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             String date = dateFormat.format(new Date());
             report.setDate(date);
 
-            //Recebe os dados do usuario de USER_PREFERENCES
+            //Recebe o ID do usuario de SharedPreferences
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
             USER_ID = sharedPref.getString("user_id", "");
 
@@ -275,45 +276,37 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             }
 
             //-------------------------------------------------------------------------------------
-            //Enviando textos ao servidor utilizando Retrofit
-            api.reportCreate(report).enqueue(new Callback<Report>() {
-
+            //Enviando dados ao servidor utilizando Retrofit
+            Call call = api.reportCreate(report);
+            call.enqueue(new Callback() {
                 @Override
-                public void onResponse(Response<Report> response, Retrofit retrofit) {
-                    //Se o servidor retornou com sucesso
-                    if (response.isSuccess()) {
+                public void onResponse(Response response, Retrofit retrofit) {
+                    if (response.code() == 200){
 
-                        // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Problema reportado com sucesso!", Toast.LENGTH_LONG).show();
 
                         //Esvazia o campo "problem_photo" em SharedPreferences para liberar o ImageView que guarda a foto do problema
                         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("problem_photo", "").apply();
-
-                        //Volta a tela de Feed
-                        Intent i = new Intent(ReportActivity.this, MenuActivity.class);
-                        startActivity(i);
-                        finish();
-
-                    } else {
-                        try {
-                            String error = response.errorBody().string();
-                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
-
-                        } catch (IOException e) {
-                            Log.e("ERROR TAG", e.getMessage(), e);
-                        }
                     }
+                    else
+                        Toast.makeText(getApplicationContext(), "Erro ao reportar problema!", Toast.LENGTH_LONG).show();
+
+                    Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                    startActivity(i);
+                    finish();
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Log.e("ERROR_FAILURE", t.getMessage());
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+
+                    Toast.makeText(getApplicationContext(), "Avaliação não pode ser enviada!", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(getApplicationContext(), MenuActivity.class);
+                    startActivity(i);
+                    finish();
                 }
             });
-
         }
 
         //Se o usuario clicar no botao GET MY COORDINATES, coloca o valor das coordenadas da localizacao do usuario no TextView Endereço

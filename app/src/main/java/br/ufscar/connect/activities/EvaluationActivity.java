@@ -85,11 +85,11 @@ public class EvaluationActivity extends Activity {
                 return;
             }
 
+            //Pegando o ID do usuario de SharedPreferences
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm a");
-
             String userId = sharedPref.getString("user_id", "");
             String espaco = spinner_espacos.getSelectedItem().toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm a");
             String data = dateFormat.format(new Date());
             Evaluation evaluation = new Evaluation(userId, espaco, data, notaInfra.getRating(), notaLimp.getRating(), notaAcess.getRating(),
                     notaSeg.getRating(), notaGeral.getRating());
@@ -114,7 +114,7 @@ public class EvaluationActivity extends Activity {
                                  startActivity(i);
                                  finish();
                              }
-                         });
+            });
         }
     }
 

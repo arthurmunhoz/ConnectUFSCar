@@ -136,9 +136,6 @@ public class FeedActivity extends Activity {
 
                     List<Report> reportList = api.reportList().execute().body();
 
-                    //Ordenando reportList
-
-
                     for (Report r : reportList) {
                         User user = api.getUser(r.getUser_id()).execute().body();
                         if (user != null) {
