@@ -36,6 +36,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.User;
 import br.ufscar.connect.R;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
+import id.zelory.compressor.Compressor;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import retrofit.Callback;
 import retrofit.Response;
@@ -74,6 +76,8 @@ public class EditProfileActivity extends Activity {
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 1;
 
     Uri imageUri;
+
+    File imageFile;
 
     Map resultMap = new Map() {
         @Override
@@ -205,6 +209,10 @@ public class EditProfileActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+
+        //Recebe os dados do usuario de USER_PREFERENCES
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+        USER_PHOTO = sharedPref.getString("image_url", "");
 
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
@@ -365,20 +373,6 @@ public class EditProfileActivity extends Activity {
                         editor.putString("image_url", user.getUser_photo()).apply();
                         editor.putString("username", user.getUsername()).apply();
 
-                        //--------------------------------------------------------------
-                        //Iniciando upload da imagem usando Couldinary
-                        Map config = new HashMap();
-                        config.put("cloud_name", "cloud-connectufscar");
-                        config.put("api_key", "726282638648912");
-                        config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
-                        Cloudinary mobileCloudinary = new Cloudinary(config);
-
-//                        try {
-//                            mobileCloudinary.uploader().upload(response.body().getUser_photo(), ObjectUtils.emptyMap());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Dados atualizados com sucesso!", Toast.LENGTH_LONG).show();
 
@@ -500,6 +494,11 @@ public class EditProfileActivity extends Activity {
 
             imageURL = (String) resultMap.get("url");
 
+            //Salva os dados do usuario em SharedPreferences para uso em outras activites
+            SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("image_url", imageURL).apply();
+
             //hide the dialog
             if (asyncDialog.isShowing())
                 asyncDialog.dismiss();
@@ -536,7 +535,15 @@ public class EditProfileActivity extends Activity {
                 return null;
             } else {
 
-                //Pegamos os 'path' real da imagem Uri para passar ao Cloudinary
+                //Primeiro pegamos o path real da Uri da imagem
+                imagePath = getPath(imageUri);
+                //Depois, criamos um arquivo com o path da imagem
+                imageFile = new File(imagePath);
+                //Depois, utilizamos a biblioteca Compressor para comprimir uma imageFile para Bitmap
+                cameraImage = Compressor.getDefault(EditProfileActivity.this).compressToBitmap(imageFile);
+                //Depois, pegamos o 'path' dessa imagem Bitmap
+                imageUri = getImageUri(EditProfileActivity.this, cameraImage);
+                //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
                 imagePath = getPath(imageUri);
 
                 //Iniciando upload da imagem usando Couldinary
@@ -628,6 +635,8 @@ public class EditProfileActivity extends Activity {
         imageUri = data.getData();
 
         new upToCloud().execute();
+
+        USER_PHOTO = imagePath;
 
         //Colocando e ajustando a imagem na UI
         iv_profile_pic.setVisibility(View.VISIBLE);

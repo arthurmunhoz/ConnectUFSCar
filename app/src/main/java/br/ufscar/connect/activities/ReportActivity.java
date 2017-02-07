@@ -482,9 +482,9 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                 } else {
                     //Storage Permission already granted
                     //Colocando e ajustando a imagem na UI
-                    iv_foto.setBackground(null);
-                    //iv_profile_pic.setImageBitmap(cameraImage);
-                    iv_foto.setVisibility(View.VISIBLE);
+                    //Enviando a foto para o servidor Cloudinary e salvando a URL na variavel imageURL para salvar no BD
+                    new upToCloud().execute();
+
                     Picasso.Builder builder = new Picasso.Builder(this);
                     builder.listener(new Picasso.Listener() {
                         @Override
@@ -492,29 +492,14 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                             exception.printStackTrace();
                         }
                     });
-                    builder.build().load(imageUri)
+                    builder.build().load(imageURL)
                             .fit()
                             .centerInside()
                             .into(iv_foto);
+                    iv_foto.setVisibility(View.VISIBLE);
+
 
                 }
-
-                //Enviando a foto para o servidor Cloudinary e salvando a URL na variavel imageURL para salvar no BD
-                new upToCloud().execute();
-
-                Picasso.Builder builder = new Picasso.Builder(this);
-                builder.listener(new Picasso.Listener() {
-                    @Override
-                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                        exception.printStackTrace();
-                    }
-                });
-                builder.build().load(imageURL)
-                        .fit()
-                        .centerInside()
-                        .into(iv_foto);
-                iv_foto.setVisibility(View.VISIBLE);
-
             }
         }
 
