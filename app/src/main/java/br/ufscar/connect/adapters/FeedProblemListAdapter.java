@@ -1,5 +1,6 @@
 package br.ufscar.connect.adapters;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +42,7 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
     Bitmap resizedUserPhoto, resizedProblemPhoto;
     Uri userPhotoUri, problemPhotoUri;
     String userImageUrl, problemImageUrl;
+    Context context = getContext();
 
     public FeedProblemListAdapter(Context context, List<FeedProblemPost> feedProblemPostList){
         super(context, 0, feedProblemPostList);
@@ -80,24 +82,14 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
 
             @Override
             protected Void doInBackground(Object... params) {
-                /*
-                Ion.with(getContext())
-                        .load(post.getUserUrl())
-                        .withBitmap()
-                        .transform(new Transform() {
-                            @Override
-                            public Bitmap transform(Bitmap bitmap) {
-                                return createCircleBitmap(userPhoto);
-                            }
 
-                            @Override
-                            public String key() {
-                                return null;
-                            }
-                        })
-                        .placeholder(R.drawable.usericon2)
-                        .intoImageView(ivUserPhoto);
-                */
+                Uri uri =  Uri.parse(post.getUserUrl());
+                try {
+                    userPhoto = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 try {
 
                     userPhoto = BitmapFactory.decodeStream(new URL(post.getUserUrl()).openConnection().getInputStream());

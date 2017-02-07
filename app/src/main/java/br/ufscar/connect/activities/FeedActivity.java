@@ -21,10 +21,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import br.ufscar.connect.ConnectApplication;
+import br.ufscar.connect.adapters.CustomComparatorEvaluationsPosts;
+import br.ufscar.connect.adapters.CustomComparatorProblemsPosts;
 import br.ufscar.connect.adapters.FeedEvaluationListAdapter;
 import br.ufscar.connect.adapters.FeedProblemListAdapter;
 import br.ufscar.connect.interfaces.ConnectUFSCarApi;
@@ -110,6 +112,7 @@ public class FeedActivity extends Activity {
 
     }
 
+
     @Override
     public void onResume(){
         super.onResume();
@@ -130,7 +133,11 @@ public class FeedActivity extends Activity {
             @Override
             protected Object doInBackground(Object[] params) {
                 try {
+
                     List<Report> reportList = api.reportList().execute().body();
+
+                    //Ordenando reportList
+
 
                     for (Report r : reportList) {
                         User user = api.getUser(r.getUser_id()).execute().body();
@@ -146,6 +153,7 @@ public class FeedActivity extends Activity {
 
                     for (Evaluation e : evaluationList) {
                         User user = api.getUser(e.getUserId()).execute().body();
+
                         if (user != null) {
                             FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
                                     user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
@@ -187,8 +195,10 @@ public class FeedActivity extends Activity {
                 lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
 
                 FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
-                FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
 
+                Collections.sort(feedProblemPostList, new CustomComparatorProblemsPosts());
+                Collections.sort(feedEvaluationPost, new CustomComparatorEvaluationsPosts());
+                FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
                 lv_all_publications.setAdapter(problemListAdapter);
 
                 progressDialog.dismiss();
