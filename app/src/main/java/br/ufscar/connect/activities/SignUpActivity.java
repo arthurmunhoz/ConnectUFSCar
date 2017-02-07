@@ -180,23 +180,28 @@ public class SignUpActivity extends Activity {
 
         if (v.getId() == R.id.iv_profile_picture || v.getId() == R.id.tv_changePicture) {
 
-            //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                //Request STORAGE Permission
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    requestStoragePermission();
-                } else {
-                    // No explanation needed, we can request the permission.
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+            //Request STORAGE Permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+
+                // Checa se o user realmente deu permissão
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    goToPhotoDialog();
                 }
-            } else {
+            }
+            // Permissão já estava dada
+            else {
                 goToPhotoDialog();
             }
+
             return;
         }
 
         //Se o usuario clicar no botao CONCLUIDO, exibe-se uma mensagem e retorna para a activity LoginActivity
-        if (v.getId() == R.id.btn_concluido) {
+        if (v.getId() == R.id.btn_concluido)
+
+        {
 
             //Recebendo texto inserido pelo usuario nos campos xml
             user.setUser_type(et_user_type.getSelectedItem().toString());
@@ -211,7 +216,8 @@ public class SignUpActivity extends Activity {
             //-------------------- VERIFICACOES DE ERROS ----------------------
 
             //Se o usuario nao digitar nada em em algum dos campos, recebe uma mensagem de erro
-            if (!allFieldsValid()) ;
+            if (!allFieldsValid())
+                return;
             // end of VERIFICACAO DE ERROS
 
             //Salva os dados do usuario em SharedPreferences para uso em outras activites
@@ -440,94 +446,26 @@ public class SignUpActivity extends Activity {
     }
 
     private void uploadFromCamera(Intent data) {
-        //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        //Imagem capturada salva na variavel imageUri(Uri)
+        imageUri = data.getData();
+        cameraImage = (Bitmap) data.getExtras().get("data");
+        //Colocando e ajustando a imagem na UI
+        iv_profile_pic.setBackground(null);
+        iv_profile_pic.setVisibility(View.VISIBLE);
+        //Fazendo upload da imagem para Cloudinary
+        new upToCloud().execute();
 
-                //Storage Permission already granted, do what we need
-
-                //Imagem capturada salva na variavel imageUri(Uri)
-                imageUri = data.getData();
-                cameraImage = (Bitmap) data.getExtras().get("data");
-                //Fazendo upload da imagem para Cloudinary
-                new upToCloud().execute();
-
-                Picasso.Builder builder = new Picasso.Builder(this);
-                builder.listener(new Picasso.Listener() {
-                    @Override
-                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                        exception.printStackTrace();
-                    }
-                });
-                builder.build().load(imageUri)
-                        .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                        .transform(new CropCircleTransformation())
-                        .into(iv_profile_pic);
-
-            } else {
-
-                //Request STORAGE Permission
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-                    new AlertDialog.Builder(this)
-                            .setTitle("Permissão necessária")
-                            .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
-                            .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
-                                    Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                                public static final int REQUEST_PERMISSION_SETTING = 1;
-
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    //Prompt the user once explanation has been shown
-                                    ActivityCompat.requestPermissions(SignUpActivity.this,
-                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                            MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-
-                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                    intent.setData(uri);
-                                    startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-                                }
-                            })
-                            .create()
-                            .show();
-
-                } else {
-                    // No explanation needed, we can request the permission.
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-                }
-
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                exception.printStackTrace();
             }
-        } else {
-            //Storage Permission already granted
-            //Colocando e ajustando a imagem na UI
-            iv_profile_pic.setBackground(null);
-            iv_profile_pic.setVisibility(View.VISIBLE);
-            Picasso.Builder builder = new Picasso.Builder(this);
-            builder.listener(new Picasso.Listener() {
-                @Override
-                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                    exception.printStackTrace();
-                }
-            });
-            builder.build().load(imageUri)
-                    .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
-                    .transform(new CropCircleTransformation())
-                    .into(iv_profile_pic);
-        }
+        });
+        builder.build().load(imageUri)
+                .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                .transform(new CropCircleTransformation())
+                .into(iv_profile_pic);
     }
 
     private void uploadFromFile(Intent data) {
@@ -639,6 +577,7 @@ public class SignUpActivity extends Activity {
                 return null;
             }
         }
+
     }
 
 
