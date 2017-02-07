@@ -64,8 +64,6 @@ public class FeedActivity extends Activity {
     FeedEvaluationListAdapter evaluationListAdapter;
     FeedProblemListAdapter problemListAdapter;
 
-    ConnectUFSCarApi api;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -119,6 +117,7 @@ public class FeedActivity extends Activity {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setMessage("Carregando publicações...");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         AsyncTask task = new AsyncTask() {
@@ -155,6 +154,7 @@ public class FeedActivity extends Activity {
                             feedEvaluationPost.add(post);
                         }
                     }
+
                     return null;
                 } catch (IOException e) {
                     e.printStackTrace();

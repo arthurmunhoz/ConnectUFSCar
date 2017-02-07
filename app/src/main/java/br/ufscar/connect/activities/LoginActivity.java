@@ -84,6 +84,11 @@ public class LoginActivity extends Activity {
             }
 
             new upToDB().execute();
+
+            Intent i = new Intent(LoginActivity.this, MenuActivity.class);
+            startActivity(i);
+
+            this.finish();
         }// end of btn_entrar click
 
 
@@ -170,9 +175,6 @@ public class LoginActivity extends Activity {
                         editor.putString("username", response.body().getUsername()).apply();
                         editor.putString("problem_photo", "").apply();
 
-                        Intent i = new Intent(LoginActivity.this, MenuActivity.class);
-                        startActivity(i);
-                        return;
                     } else {
                         String error = "Não foi possível fazer login";
                         Toast.makeText(c, error, Toast.LENGTH_SHORT).show();
@@ -185,6 +187,7 @@ public class LoginActivity extends Activity {
                     Toast.makeText(c, t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
+
 
             return null;
         }

@@ -1,9 +1,12 @@
 package br.ufscar.connect.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +16,16 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
 import br.ufscar.connect.R;
 import br.ufscar.connect.models.FeedEvaluationPost;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 /**
  * Created by bruno on 04/02/17.
@@ -27,6 +34,9 @@ import br.ufscar.connect.models.FeedEvaluationPost;
 public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> {
     
     int layoutId = R.layout.layout_feed_evaluations;
+    Bitmap resizedUserPhoto;
+    Uri userPhotoUri;
+    String userImageUrl;
     
     public FeedEvaluationListAdapter(Context context, List<FeedEvaluationPost> FeedEvaluationPostList){
         super(context, 0, FeedEvaluationPostList);
@@ -67,8 +77,11 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
 
             @Override
             protected Void doInBackground(Object... params) {
+
                 try {
                     userPhoto = BitmapFactory.decodeStream(new URL(post.getUserPhotoUrl()).openConnection().getInputStream());
+                    userPhotoUri = getImageUri(getContext(), userPhoto);
+
                 } catch (IOException e) {
                     userPhoto = null;
                 }
@@ -78,8 +91,17 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                if (userPhoto != null)
-                    ivUserPhoto.setImageBitmap(userPhoto);
+                if (userPhoto != null) {
+                    //mostrando imagem com picasso
+                    Picasso.Builder builder = new Picasso.Builder(getContext());
+                    builder.listener(new Picasso.Listener() {
+                        @Override
+                        public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    });
+                    builder.build().load(userPhotoUri).transform(new CropCircleTransformation()).into(ivUserPhoto);
+                }
                 else
                     ivUserPhoto.setImageResource(R.drawable.user);
                 return;
@@ -89,5 +111,13 @@ public class FeedEvaluationListAdapter extends ArrayAdapter<FeedEvaluationPost> 
         a.execute();
 
         return convertView;
+    }
+
+    //Retorna o 'path' de uma imagem Bitmap em Uri
+    private Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 }

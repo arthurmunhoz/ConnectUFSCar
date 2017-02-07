@@ -3,7 +3,9 @@ package br.ufscar.connect.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,17 +14,25 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
 import br.ufscar.connect.R;
+import br.ufscar.connect.activities.FeedActivity;
 import br.ufscar.connect.models.FeedProblemPost;
+import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 
 public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
 
     int layoutId = R.layout.layout_feed_problems;
+    Bitmap resizedUserPhoto, resizedProblemPhoto;
+    Uri userPhotoUri, problemPhotoUri;
+    String userImageUrl, problemImageUrl;
 
     public FeedProblemListAdapter(Context context, List<FeedProblemPost> feedProblemPostList){
         super(context, 0, feedProblemPostList);
@@ -53,6 +63,9 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
         tvType.setText(post.getType());
         tvAddress.setText(post.getAddress());
         tvDescription.setText(post.getDescription());
+        userImageUrl = post.getUserUrl();
+        problemImageUrl = post.getPhotoUrl();
+
 
         AsyncTask a = new AsyncTask<Object, Void, Void>(){
             Bitmap userPhoto, problemPhoto;
@@ -61,12 +74,17 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
             protected Void doInBackground(Object... params) {
                 try {
                     userPhoto = BitmapFactory.decodeStream(new URL(post.getUserUrl()).openConnection().getInputStream());
+                    userPhotoUri = getImageUri(getContext(), userPhoto);
+
+
                 } catch (IOException e) {
                     userPhoto = null;
                 }
 
                 try {
                     problemPhoto = BitmapFactory.decodeStream(new URL(post.getPhotoUrl()).openConnection().getInputStream());
+                    problemPhotoUri = getImageUri(getContext(), problemPhoto);
+
                 } catch (IOException e) {
                     problemPhoto = null;
                 }
@@ -76,13 +94,34 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
+
                 if (userPhoto != null)
-                    ivUserPhoto.setImageBitmap(userPhoto);
+                {
+                    //mostrando imagem com picasso
+                    Picasso.Builder builder = new Picasso.Builder(getContext());
+                    builder.listener(new Picasso.Listener() {
+                        @Override
+                        public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    });
+                    builder.build().load(userPhotoUri).transform(new CropCircleTransformation()).into(ivUserPhoto);
+                }
                 else
-                    ivUserPhoto.setImageResource(R.drawable.user);
+                    ivUserPhoto.setImageResource(R.drawable.usericon2);
 
                 if (problemPhoto != null)
-                    ivPublPhoto.setImageBitmap(problemPhoto);
+                {
+                    //mostrando imagem com picasso
+                    Picasso.Builder builder = new Picasso.Builder(getContext());
+                    builder.listener(new Picasso.Listener() {
+                        @Override
+                        public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    });
+                    builder.build().load(problemPhotoUri).into(ivPublPhoto);
+                }
                 else
                     ivPublPhoto.setImageResource(R.drawable.danosgramado);
 
@@ -94,6 +133,30 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
 
 
         return convertView;
+    }
+
+    //Retorna o 'path' de uma imagem Bitmap em Uri
+    private Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 0, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    //Reduz o tamanho de uma imagem Bitmap
+    private Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
 
