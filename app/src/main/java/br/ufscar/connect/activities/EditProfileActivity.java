@@ -217,30 +217,16 @@ public class EditProfileActivity extends Activity {
         //----------------------------------------------------------------------------------------
         //Completa os objtos do XML com o conteudo adequado
         assert USER_PHOTO != null;
-        //Toast.makeText(getApplicationContext(), USER_PHOTO, Toast.LENGTH_SHORT).show();
+
         if (USER_PHOTO.contentEquals("")) {
             iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
         } else {
-            Picasso.with(context).load(USER_PHOTO).into(iv_profile_pic);
+            Picasso.with(context).load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
         }
         et_name.setText(USER_NAME); //completa o TextView com o nome COMPLETO do usuario
         et_last_name.setText(USER_LASTNAME);
         et_email.setText(USER_EMAIL); //completa o TextView com o email do usuario
         et_username.setText(USER_USERNAME);
-
-        //Storage Permission already granted
-        //Colocando e ajustando a imagem na UI
-        //iv_profile_pic.setImageBitmap(cameraImage);
-        iv_profile_pic.setVisibility(View.VISIBLE);
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.listener(new Picasso.Listener() {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                exception.printStackTrace();
-            }
-        });
-        if (USER_PHOTO != null && !USER_PHOTO.equals(""))
-            builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
 
     }
 

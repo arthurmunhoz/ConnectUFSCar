@@ -39,7 +39,6 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
 
     int layoutId = R.layout.layout_feed_problems;
-    Bitmap resizedUserPhoto, resizedProblemPhoto;
     Uri userPhotoUri, problemPhotoUri;
     String userImageUrl, problemImageUrl;
     Context context = getContext();
@@ -83,15 +82,7 @@ public class FeedProblemListAdapter extends ArrayAdapter<FeedProblemPost> {
             @Override
             protected Void doInBackground(Object... params) {
 
-                Uri uri =  Uri.parse(post.getUserUrl());
                 try {
-                    userPhoto = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-
                     userPhoto = BitmapFactory.decodeStream(new URL(post.getUserUrl()).openConnection().getInputStream());
                     userPhotoUri = getImageUri(getContext(), userPhoto);
 

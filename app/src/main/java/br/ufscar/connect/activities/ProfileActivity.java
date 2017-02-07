@@ -99,6 +99,7 @@ public class ProfileActivity extends Activity {
 
         final ProgressDialog progressDialog = new ProgressDialog(ProfileActivity.this);
         progressDialog.setMessage("Carregando minhas publicações");
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         AsyncTask task = new AsyncTask() {
