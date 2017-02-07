@@ -194,7 +194,7 @@ public class EditProfileActivity extends Activity {
         if (USER_PHOTO.contentEquals("")) {
             iv_profile_pic.setBackgroundResource(R.drawable.usericon2);
         } else {
-            Picasso.with(context).load(USER_PHOTO).into(iv_profile_pic);
+            Picasso.with(this).load(USER_PHOTO).into(iv_profile_pic);
         }
         et_name.setText(USER_NAME); //completa o TextView com o nome COMPLETO do usuario
         et_last_name.setText(USER_LASTNAME);
@@ -457,109 +457,10 @@ public class EditProfileActivity extends Activity {
                 switch (requestCode) {
 
                     case REQUEST_CAMERA:
-
-                        //Imagem capturada salva na variavel cameraImage (bitmap)
-                        cameraImage = (Bitmap) data.getExtras().get("data");  //agora ja temos a imagem da camera guardada em cameraImage
-                        imageUri = data.getData();
-
-                        /*//Convertendo cameraImage em um InputStream
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        cameraImage.compress(Bitmap.CompressFormat.JPEG, 0, stream);
-                        InputStream is = new ByteArrayInputStream(stream.toByteArray()); */
-
-                        //Checks for STORAGE PERMISSION, if the app doesn't have permission, asks the user for it
-                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                                //Storage Permission already granted
-                                //Colocando e ajustando a imagem na UI
-                                iv_profile_pic.setBackground(null);
-                                //iv_profile_pic.setImageBitmap(cameraImage);
-                                iv_profile_pic.setVisibility(View.VISIBLE);
-                                Picasso.Builder builder = new Picasso.Builder(this);
-                                builder.listener(new Picasso.Listener() {
-                                    @Override
-                                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                        exception.printStackTrace();
-                                    }
-                                });
-                                builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
-
-
-                            } else {
-
-                                //Request Location Permission
-                                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                                    // Show an explanation to the user *asynchronously* -- don't block
-                                    // this thread waiting for the user's response! After the user
-                                    // sees the explanation, try again to request the permission.
-                                    new AlertDialog.Builder(this)
-                                            .setTitle("Permissão necessária")
-                                            .setMessage("Habilite a permissão de ARMAZENAMENTO em:                 Permissões > Armazenamento")
-                                            .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    //Se o usuario cancelar a autorizacao de permissao, visualiza o mapa sem o botao MyLocation
-                                                    Toast.makeText(getApplicationContext(), "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show();
-                                                }
-                                            })
-
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-                                                public static final int REQUEST_PERMISSION_SETTING = 1;
-
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-                                                    //Prompt the user once explanation has been shown
-                                                    ActivityCompat.requestPermissions(EditProfileActivity.this,
-                                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                                            MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-
-                                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                                    intent.setData(uri);
-                                                    startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-
-                                                }
-                                            })
-                                            .create()
-                                            .show();
-
-                                } else {
-                                    // No explanation needed, we can request the permission.
-                                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
-                                }
-
-                            }
-                        } else {
-                            //Storage Permission already granted
-                            //Colocando e ajustando a imagem na UI
-                            iv_profile_pic.setBackground(null);
-                            //iv_profile_pic.setImageBitmap(cameraImage);
-                            iv_profile_pic.setVisibility(View.VISIBLE);
-                            Picasso.Builder builder = new Picasso.Builder(this);
-                            builder.listener(new Picasso.Listener() {
-                                @Override
-                                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                                    exception.printStackTrace();
-                                }
-                            });
-                            builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
-
-                        }
-
+                        uploadFromCamera(data);
 
                     case SELECT_FILE:
-
-                        imageUri = data.getData();
-
-                        //iv_profile_pic.setImageBitmap(cameraImage);
-                        //iv_profile_pic.setImageURI(imageUri);
-                        iv_profile_pic.setBackground(null);
-                        Picasso.with(this).load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
-                        iv_profile_pic.setVisibility(View.VISIBLE);
+                        uploadFromFile(data);
 
                 }//end of SELECT_FILE
             }
@@ -635,7 +536,7 @@ public class EditProfileActivity extends Activity {
                 return null;
             } else {
 
-                //Pegamos os 'path' real da imagem Uri para passar ao CLoudinary
+                //Pegamos os 'path' real da imagem Uri para passar ao Cloudinary
                 imagePath = getPath(imageUri);
 
                 //Iniciando upload da imagem usando Couldinary
@@ -691,6 +592,55 @@ public class EditProfileActivity extends Activity {
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+    private void uploadFromCamera(Intent data) {
+        //Imagem capturada salva na variavel imageUri(Uri)
+        imageUri = data.getData();
+        cameraImage = (Bitmap) data.getExtras().get("data");
+        //Colocando e ajustando a imagem na UI
+        iv_profile_pic.setBackground(null);
+        iv_profile_pic.setVisibility(View.VISIBLE);
+        //Fazendo upload da imagem para Cloudinary
+        new upToCloud().execute();
+
+        Picasso.Builder builder = new Picasso.Builder(this);
+        builder.listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        builder.build().load(imageUri)
+                .resize(iv_profile_pic.getMaxWidth(), iv_profile_pic.getMaxHeight())
+                .transform(new CropCircleTransformation())
+                .into(iv_profile_pic);
+    }
+
+    private void uploadFromFile(Intent data) {
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {// to avoid the NullPointerException
+            cameraImage = (Bitmap) data.getExtras().get("data");
+            Toast.makeText(getApplicationContext(), imageUri.toString(), Toast.LENGTH_LONG).show();
+        }
+
+        imageUri = data.getData();
+
+        new upToCloud().execute();
+
+        //Colocando e ajustando a imagem na UI
+        iv_profile_pic.setVisibility(View.VISIBLE);
+
+        Picasso.Builder builder = new Picasso.Builder(EditProfileActivity.this);
+        builder.listener(new Picasso.Listener() {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+
+        builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
     }
 
 

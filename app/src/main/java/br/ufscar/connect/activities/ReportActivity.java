@@ -283,6 +283,11 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Problema reportado com sucesso!", Toast.LENGTH_LONG).show();
 
+                        //Esvazia o campo "problem_photo" em SharedPreferences para liberar o ImageView que guarda a foto do problema
+                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("problem_photo", "").apply();
+
                         //Volta a tela de Feed
                         Intent i = new Intent(ReportActivity.this, MenuActivity.class);
                         startActivity(i);
@@ -494,7 +499,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
 
                 }
 
-                //Enviando a foto para o servidor Cloudinary e salvando o URL na variavel imageURL para salvar no BD
+                //Enviando a foto para o servidor Cloudinary e salvando a URL na variavel imageURL para salvar no BD
                 new upToCloud().execute();
 
                 Picasso.Builder builder = new Picasso.Builder(this);
@@ -519,12 +524,6 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        //Display alert message when back button has been pressed
-        finish();
     }
 
     //Envia as fotos no formato Uri para o servidor Cloudinary
@@ -624,6 +623,24 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
 
+    @Override
+    public void onBackPressed() {
+        //Display alert message when back button has been pressed
+        backButtonHandler();
+    }
+
+    public void backButtonHandler() {
+
+        //Esvazia o campo "problem_photo" em SharedPreferences para liberar o ImageView que guarda a foto do problema
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("problem_photo", "").apply();
+
+        //Volta para o Feed
+        Intent i = new Intent(this, MenuActivity.class);
+        startActivity(i);
+        this.finish(); //termina a atividade liberando memória
+    }
 
 
 }

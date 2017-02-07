@@ -424,6 +424,7 @@ public class SignUpActivity extends Activity {
     }
 
     private void uploadFromFile(Intent data) {
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {// to avoid the NullPointerException
             cameraImage = (Bitmap) data.getExtras().get("data");

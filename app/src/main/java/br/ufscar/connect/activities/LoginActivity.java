@@ -168,6 +168,7 @@ public class LoginActivity extends Activity {
                         editor.putString("usertype", response.body().getUser_type()).apply();
                         editor.putString("image_url", response.body().getUser_photo()).apply();
                         editor.putString("username", response.body().getUsername()).apply();
+                        editor.putString("problem_photo", "").apply();
 
                         Intent i = new Intent(LoginActivity.this, MenuActivity.class);
                         startActivity(i);
