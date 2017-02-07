@@ -86,7 +86,7 @@ public class EvaluationActivity extends Activity {
             }
 
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm a");
 
             String userId = sharedPref.getString("user_id", "");
             String espaco = spinner_espacos.getSelectedItem().toString();

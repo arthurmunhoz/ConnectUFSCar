@@ -41,6 +41,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -242,7 +243,9 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             report.setProblemCategory(et_category.getItemAtPosition(position).toString()); //recebe o item selecionado (string)
             report.setProblemDescription(et_description.getText() + "");
             report.setProblemPhoto(imageURL);
-            String date = new Date(System.currentTimeMillis()).toString();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - HH:mm a");
+            String date = dateFormat.format(new Date());
             report.setDate(date);
 
             //Recebe os dados do usuario de USER_PREFERENCES
