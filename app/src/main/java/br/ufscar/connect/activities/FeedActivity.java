@@ -2,6 +2,7 @@ package br.ufscar.connect.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -116,48 +117,85 @@ public class FeedActivity extends Activity {
 
         api = ((ConnectApplication) getApplication()).getApi();
 
-        AsyncTask task = loadPublicationsTask();
-        try {
-            task.execute().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("Carregando publicações...");
+        progressDialog.show();
 
+        AsyncTask task = new AsyncTask() {
 
-        //Referencia as variáveis aos objetos do XML
-        cv_separator = (View) findViewById(R.id.cv_separator);
+            final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
 
-        btnEvaluations = (Button) findViewById(R.id.btn_evalutaions);
-        btnProblems = (Button) findViewById(R.id.btn_problems);
+            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+            List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
 
-        iv_user_photo = (ImageView) findViewById(R.id.iv_user_photo);
-        iv_publ_photo = (ImageView) findViewById(R.id.iv_publ_photo);
+            @Override
+            protected Object doInBackground(Object[] params) {
+                try {
+                    List<Report> reportList = api.reportList().execute().body();
 
-        tv_username = (TextView) findViewById(R.id.tv_name);
-        tv_usertype = (TextView) findViewById(R.id.tv_usertype);
-        tv_date = (TextView) findViewById(R.id.tv_date);
-        tv_type = (TextView) findViewById(R.id.tv_type);
-        tv_adrress = (TextView) findViewById(R.id.tv_address);
-        tv_description = (TextView) findViewById(R.id.tv_description);
+                    for (Report r : reportList) {
+                        User user = api.getUser(r.getUser_id()).execute().body();
+                        if (user != null) {
+                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
+                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
+                                    r.getProblemPhoto(), user.getUser_photo());
+                            feedProblemPostList.add(post);
+                        }
+                    }
 
-        lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
+                    List<Evaluation> evaluationList = api.evaluationList().execute().body();
 
+                    for (Evaluation e : evaluationList) {
+                        User user = api.getUser(e.getUserId()).execute().body();
+                        if (user != null) {
+                            FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
+                                    user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
+                                    e.getLimp(), e.getSeg(), e.getGeral());
 
-        // FIXME: péssima gambiarra abaixo. Fica aguardando a task carregar as listas
-        while (this.feedEvaluationPostList == null || this.feedProblemPostList == null){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                            feedEvaluationPost.add(post);
+                        }
+                    }
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
-        }
 
-        this.evaluationListAdapter = new FeedEvaluationListAdapter(this, feedEvaluationPostList);
-        this.problemListAdapter = new FeedProblemListAdapter(this, feedProblemPostList);
+            @Override
+            protected void onPostExecute(Object o) {
+                FeedActivity.feedProblemPostList = feedProblemPostList;
+                FeedActivity.feedEvaluationPostList = feedEvaluationPost;
+                //Referencia as variáveis aos objetos do XML
+                cv_separator = (View) findViewById(R.id.cv_separator);
 
-        lv_all_publications.setAdapter(problemListAdapter);
+                btnEvaluations = (Button) findViewById(R.id.btn_evalutaions);
+                btnProblems = (Button) findViewById(R.id.btn_problems);
+
+                iv_user_photo = (ImageView) findViewById(R.id.iv_user_photo);
+                iv_publ_photo = (ImageView) findViewById(R.id.iv_publ_photo);
+
+                tv_username = (TextView) findViewById(R.id.tv_name);
+                tv_usertype = (TextView) findViewById(R.id.tv_usertype);
+                tv_date = (TextView) findViewById(R.id.tv_date);
+                tv_type = (TextView) findViewById(R.id.tv_type);
+                tv_adrress = (TextView) findViewById(R.id.tv_address);
+                tv_description = (TextView) findViewById(R.id.tv_description);
+
+                lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
+
+                FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
+                FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
+
+                lv_all_publications.setAdapter(problemListAdapter);
+
+                progressDialog.hide();
+            }
+        };
+
+        task.execute();
+
     }
 
     @Override
@@ -222,55 +260,5 @@ public class FeedActivity extends Activity {
         alertDialog.show();
     }
 
-
-    public AsyncTask loadPublicationsTask() {
-        final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
-
-        return new AsyncTask() {
-            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
-            List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
-
-            @Override
-            protected Object doInBackground(Object[] params) {
-                try {
-                    List<Report> reportList = api.reportList().execute().body();
-
-                    for (Report r : reportList) {
-                        User user = api.getUser(r.getUser_id()).execute().body();
-                        if (user != null) {
-                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
-                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
-                                    r.getProblemPhoto(), user.getUser_photo());
-                            feedProblemPostList.add(post);
-                        }
-                    }
-
-                    List<Evaluation> evaluationList = api.evaluationList().execute().body();
-
-                    for (Evaluation e : evaluationList) {
-                        User user = api.getUser(e.getUserId()).execute().body();
-                        if (user != null) {
-                            FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
-                                    user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
-                                    e.getLimp(), e.getSeg(), e.getGeral());
-
-                            feedEvaluationPost.add(post);
-                        }
-                    }
-                    // FIXME: as duas linhas a baixo deviam estar no onPostExecute, mas por algum motivo ele nao tá sendo chamado nunca...
-                    FeedActivity.feedProblemPostList = feedProblemPostList;
-                    FeedActivity.feedEvaluationPostList = feedEvaluationPost;
-                    return null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-            }
-        };
-    }
 }
+
