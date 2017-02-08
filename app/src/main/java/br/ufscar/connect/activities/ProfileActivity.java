@@ -91,6 +91,8 @@ public class ProfileActivity extends Activity {
             });
             builder.build().load(USER_PHOTO).transform(new CropCircleTransformation()).into(iv_profile_pic);
         }
+        else
+            Picasso.with(this).load(R.drawable.usericon2).into(iv_profile_pic);
 
         tv_name.setText(USER_NAME + " " + USER_LASTNAME); //completa o TextView com o nome COMPLETO do usuario
         tv_usertype.setText(USER_TYPE); //completa o TextView com o tipo do usuario

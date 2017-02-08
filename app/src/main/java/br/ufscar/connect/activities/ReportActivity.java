@@ -252,6 +252,7 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
             //Recebe o ID do usuario de SharedPreferences
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
             USER_ID = sharedPref.getString("user_id", "");
+            report.setUser_id(USER_ID);
 
             //--------------------------------------------------------------------------------------------
             //Tratando erros
