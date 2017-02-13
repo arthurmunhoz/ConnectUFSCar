@@ -141,9 +141,9 @@
         <item>Docente</item>
         <item>Outro</item>
     </string-array>
-    <string name="title_activity_maps">Visualizar</string>
-    <string name="title_activity_edit_profile">EditProfileActivity</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_maps">Visualizar</string>
+
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
 
 </resources>

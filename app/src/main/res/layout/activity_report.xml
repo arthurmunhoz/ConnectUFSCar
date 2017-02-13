@@ -218,7 +218,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="60dp"
                     android:id="@+id/et_address"
-                    android:hint="Digite o endereço"
+                    android:hint="Qual o local?"
                     android:typeface="normal"
                     android:maxLines="2"
                     android:textSize="18dp"
