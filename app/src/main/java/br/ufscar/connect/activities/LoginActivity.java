@@ -85,7 +85,6 @@ public class LoginActivity extends Activity {
 
             new upToDB().execute();
 
-            this.finish();
         }// end of btn_entrar click
 
 
@@ -116,6 +115,7 @@ public class LoginActivity extends Activity {
 
     public void onResume() {
         super.onResume();
+
 
     }
 
