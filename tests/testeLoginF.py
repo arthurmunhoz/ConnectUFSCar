@@ -4,7 +4,7 @@ senha ='b'
 
 #instalando app e preparando dispositivo
 device = MonkeyRunner.waitForConnection()
-device.installPackage('/home/pmario/AndroidStudioProjects/ConnectUFSCar-master/app/build/outputs/apk')
+device.installPackage('apkDir')
 package = 'br.ufscar.connect'
 activity = 'br.ufscar.connect.activities.LoginActivity'
 runComponent = package + '/' + activity

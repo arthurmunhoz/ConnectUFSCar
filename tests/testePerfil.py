@@ -4,7 +4,7 @@ senha ='a'
 
 #instalando app e preparando dispositivo
 device = MonkeyRunner.waitForConnection()
-device.installPackage('/home/pmario/AndroidStudioProjects/ConnectUFSCar-master/app/build/outputs/apk')
+device.installPackage('apkDir')
 package = 'br.ufscar.connect'
 activity = 'br.ufscar.connect.activities.LoginActivity'
 runComponent = package + '/' + activity
@@ -32,11 +32,6 @@ device.touch(171,332,MonkeyDevice.DOWN_AND_UP)
 MonkeyRunner.sleep(15)
 device.touch(203,50,MonkeyDevice.DOWN_AND_UP)
 MonkeyRunner.sleep(4)
-# Takes a screenshot
+
 result = device.takeSnapshot()
-
-# Writes the screenshot to a file
 result.writeToFile('testePerfil.png','png')
-
-
-
