@@ -101,16 +101,85 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
         //SWIPE REFRESH ON LISTVIEW
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                                                    //O metodo onRefresh() é chamado toda vez que o usuario realize um SCROLL DOWN no Feed
                                                     @Override
                                                     public void onRefresh() {
                                                         swipeRefreshLayout.setRefreshing(true);
-                                                        //Deixa registrado que as imagens do feed ja foram carregadas uma vez
-                                                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                                                        SharedPreferences.Editor editor = sharedPref.edit();
-                                                        editor.putBoolean("imagesLoaded", false).apply(); //controle do feed
 
-                                                        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
-                                                        startActivity(intent);
+                                                        final ProgressDialog progressDialog = new ProgressDialog(context);
+                                                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                                        progressDialog.setMessage("Carregando publicações...");
+                                                        progressDialog.setCancelable(false);
+                                                        progressDialog.show();
+
+                                                        AsyncTask task = new AsyncTask() {
+
+                                                            final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
+
+                                                            List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
+                                                            List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
+
+                                                            @Override
+                                                            protected Object doInBackground(Object[] params) {
+                                                                try {
+
+                                                                    List<Report> reportList = api.reportList().execute().body();
+
+                                                                    for (Report r : reportList) {
+                                                                        User user = api.getUser(r.getUser_id()).execute().body();
+                                                                        if (user != null) {
+                                                                            FeedProblemPost post = new FeedProblemPost(user.getName(), user.getUser_type(),
+                                                                                    r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
+                                                                                    r.getProblemPhoto(), user.getUser_photo());
+                                                                            feedProblemPostList.add(post);
+                                                                        }
+                                                                    }
+
+                                                                    List<Evaluation> evaluationList = api.evaluationList().execute().body();
+
+                                                                    for (Evaluation e : evaluationList) {
+                                                                        User user = api.getUser(e.getUserId()).execute().body();
+
+                                                                        if (user != null) {
+                                                                            FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
+                                                                                    user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
+                                                                                    e.getLimp(), e.getSeg(), e.getGeral());
+
+                                                                            feedEvaluationPost.add(post);
+                                                                        }
+                                                                    }
+
+                                                                    return null;
+                                                                } catch (IOException e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                                return null;
+                                                            }
+
+                                                            @Override
+                                                            protected void onPostExecute(Object o) {
+
+                                                                FeedActivity.feedProblemPostList = feedProblemPostList;
+                                                                FeedActivity.feedEvaluationPostList = feedEvaluationPost;
+
+                                                                FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
+
+                                                                Collections.sort(feedProblemPostList, new CustomComparatorProblemsPosts());
+                                                                Collections.sort(feedEvaluationPost, new CustomComparatorEvaluationsPosts());
+                                                                FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
+                                                                lv_all_publications.setAdapter(problemListAdapter);
+
+                                                                //Deixa registrado que as imagens do feed ja foram carregadas uma vez
+                                                                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                                                                SharedPreferences.Editor editor = sharedPref.edit();
+                                                                editor.putBoolean("imagesLoaded", true).apply(); //controle do feed
+
+                                                                progressDialog.dismiss();
+                                                            }
+                                                        };
+
+                                                        task.execute();
+
                                                         new Handler().postDelayed(new Runnable() {
                                                             @Override
                                                             public void run() {
