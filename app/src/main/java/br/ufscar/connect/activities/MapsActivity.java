@@ -1330,14 +1330,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onBackPressed() {
         //Display alert message when back button has been pressed
         backButtonHandler();
-        return;
+
     }
 
     public void backButtonHandler() {
 
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MapsActivity.this);
+        // Setting Dialog Title
+        alertDialog.setTitle("SAINDO...");
+        // Setting Dialog Message
+        alertDialog.setMessage("Tem certeza que deseja sair?");
+        // Setting Icon to Dialog
+        alertDialog.setIcon(R.drawable.doorcolored);
+        // Setting Positive "Yes" Button
+        alertDialog.setPositiveButton("SIM",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "ATÉ LOGO!", Toast.LENGTH_SHORT).show();
+
+                        try {
+                            finish();
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                });
+        // Setting Negative "NO" Button
+        alertDialog.setNegativeButton("CANCELAR",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Write your code here to invoke NO event
+                        dialog.cancel();
+                    }
+                });
+        // Showing Alert Message
+        alertDialog.show();
+        /*
         Intent i = new Intent(MapsActivity.this, MenuActivity.class);
         startActivity(i);
         finish(); //termina a atividade liberando memória
+        */
 
     }
 

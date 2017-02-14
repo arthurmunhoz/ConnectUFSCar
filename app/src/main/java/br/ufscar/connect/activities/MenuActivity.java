@@ -68,7 +68,7 @@ public class MenuActivity extends TabActivity {
         //---------------
         //define a HEIGHT da tabHost
         for (int i = 0; i < tabHost.getTabWidget().getTabCount(); i++) {
-            tabHost.getTabWidget().getChildAt(i).getLayoutParams().height = (int) (50 * this.getResources().getDisplayMetrics().density);
+            tabHost.getTabWidget().getChildAt(i).getLayoutParams().height = (int) (55 * this.getResources().getDisplayMetrics().density);
         }
 
         //---------------

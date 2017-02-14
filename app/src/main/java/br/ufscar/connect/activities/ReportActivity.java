@@ -619,9 +619,9 @@ public class ReportActivity extends Activity implements GoogleApiClient.Connecti
         editor.putString("problem_photo", "").apply();
 
         //Volta para o Feed
-        Intent i = new Intent(this, MenuActivity.class);
-        startActivity(i);
-        this.finish(); //termina a atividade liberando memória
+        //Intent i = new Intent(this, MenuActivity.class);
+        //startActivity(i);
+        finish(); //termina a atividade liberando memória
     }
 
 

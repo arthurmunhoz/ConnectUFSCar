@@ -127,7 +127,7 @@ public class LoginActivity extends Activity {
         protected void onPreExecute() {
 
             //set message of the dialog
-            pd.setMessage("Entrando...");
+            pd.setMessage("Logando sua conta...");
             pd.setCancelable(false);
             pd.show();
 
@@ -171,6 +171,7 @@ public class LoginActivity extends Activity {
                         editor.putString("image_url", response.body().getUser_photo()).apply();
                         editor.putString("username", response.body().getUsername()).apply();
                         editor.putString("problem_photo", "").apply();
+                        editor.putBoolean("imagesLoaded", false).apply(); //controle do feed
 
                         Intent i = new Intent(LoginActivity.this, MenuActivity.class);
                         startActivity(i);

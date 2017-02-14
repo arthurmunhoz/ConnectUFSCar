@@ -9,12 +9,14 @@
         android:layout_height="match_parent"
         android:id="@android:id/tabhost"
         android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="1">
 
             <TabWidget
                 android:id="@android:id/tabs"
@@ -23,12 +25,20 @@
                 android:orientation="horizontal"
                 android:background="#ffb20005"
                 android:showDividers="middle"
-                android:tabStripEnabled="true"></TabWidget>
+                android:tabStripEnabled="true"
+                android:layout_weight="1"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentBottom="true" />
 
             <FrameLayout
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="fill_parent"
+                android:layout_weight="0"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="true"
+                android:layout_above="@android:id/tabs">
 
                 <!--LinearLayout
                     android:id="@+id/tabFeed"
@@ -52,7 +62,7 @@
                     android:orientation="horizontal"/-->
 
             </FrameLayout>
-        </LinearLayout>
+        </RelativeLayout>
     </TabHost>
 
 </RelativeLayout>

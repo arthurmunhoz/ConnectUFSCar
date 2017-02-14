@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -46,16 +47,20 @@ import br.ufscar.connect.models.User;
 
 
 public class FeedActivity extends Activity {
+
     private static List<FeedProblemPost> feedProblemPostList;
-    private static List<FeedEvaluationPost> feedEvaluationPostList;
-    public final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
 
     //-------------------------------------------------
     //Declarando variaveis
 
+    private static List<FeedEvaluationPost> feedEvaluationPostList;
+
+    public final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
+
     View cv_separator;
 
-    int sessionCtrl = 0;
+    boolean imagesLoaded;
+
     Button btnProblems, btnEvaluations;
 
     ImageView iv_user_photo;
@@ -83,11 +88,37 @@ public class FeedActivity extends Activity {
     }
 
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_feed);
+        context = this;
+
+    }
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+
+        //Recebe os dados do usuario de USER_PREFERENCES
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+        imagesLoaded = sharedPref.getBoolean("imagesLoaded", false);
+
+
+        if (!imagesLoaded) {
+            checksForStoragePermission();
+        }
+
+    }
+
     public void onButtonClick(View v) {
 
         //Clicou no botão 'AVALIAÇÕES'
-        if (v.getId() == R.id.btn_evalutaions) {
+        if (v.getId() == R.id.btn_evaluations) {
 
+            //se nao tem permissao de armazenamento..
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 checksForStoragePermission();
             }
@@ -123,24 +154,6 @@ public class FeedActivity extends Activity {
 
     }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feed);
-        context = this;
-
-    }
-
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        checksForStoragePermission();
-
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -164,7 +177,6 @@ public class FeedActivity extends Activity {
         //Display alert message when back button has been pressed
         backButtonHandler();
 
-        return;
     }
 
     //Altera a função do botão "voltar" do Android
@@ -306,7 +318,7 @@ public class FeedActivity extends Activity {
                         //Referencia as variáveis aos objetos do XML
                         cv_separator =       findViewById(R.id.cv_separator);
 
-                        btnEvaluations =    (Button) findViewById(R.id.btn_evalutaions);
+                        btnEvaluations =    (Button) findViewById(R.id.btn_evaluations);
                         btnProblems =       (Button) findViewById(R.id.btn_problems);
 
                         iv_user_photo =     (ImageView) findViewById(R.id.iv_user_photo);
@@ -328,11 +340,18 @@ public class FeedActivity extends Activity {
                         FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
                         lv_all_publications.setAdapter(problemListAdapter);
 
+                        //Deixa registrado que as imagens do feed ja foram carregadas uma vez
+                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean("imagesLoaded", true).apply(); //controle do feed
+
                         progressDialog.dismiss();
+
                     }
                 };
 
                 task.execute();
+
             }
         }
         else{
@@ -396,7 +415,7 @@ public class FeedActivity extends Activity {
                     //Referencia as variáveis aos objetos do XML
                     cv_separator =       findViewById(R.id.cv_separator);
 
-                    btnEvaluations =    (Button) findViewById(R.id.btn_evalutaions);
+                    btnEvaluations =    (Button) findViewById(R.id.btn_evaluations);
                     btnProblems =       (Button) findViewById(R.id.btn_problems);
 
                     iv_user_photo =     (ImageView) findViewById(R.id.iv_user_photo);
@@ -418,7 +437,13 @@ public class FeedActivity extends Activity {
                     FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
                     lv_all_publications.setAdapter(problemListAdapter);
 
+                    //Deixa registrado que as imagens do feed ja foram carregadas uma vez
+                    SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean("imagesLoaded", true).apply(); //controle do feed
+
                     progressDialog.dismiss();
+
                 }
             };
 

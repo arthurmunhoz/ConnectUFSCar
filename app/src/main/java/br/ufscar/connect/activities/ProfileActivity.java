@@ -1,8 +1,10 @@
 package br.ufscar.connect.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -219,8 +222,41 @@ public class ProfileActivity extends Activity {
 
     public void backButtonHandler() {
 
-        Intent i = new Intent(ProfileActivity.this, MenuActivity.class);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(ProfileActivity.this);
+        // Setting Dialog Title
+        alertDialog.setTitle("SAINDO...");
+        // Setting Dialog Message
+        alertDialog.setMessage("Tem certeza que deseja sair?");
+        // Setting Icon to Dialog
+        alertDialog.setIcon(R.drawable.doorcolored);
+        // Setting Positive "Yes" Button
+        alertDialog.setPositiveButton("SIM",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "ATÉ LOGO!", Toast.LENGTH_SHORT).show();
+
+                        try {
+                            finish();
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
+                });
+        // Setting Negative "NO" Button
+        alertDialog.setNegativeButton("CANCELAR",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Write your code here to invoke NO event
+                        dialog.cancel();
+                    }
+                });
+        // Showing Alert Message
+        alertDialog.show();
+
+        /*
+        Intent i = new Intent(ProfileActivity.this, getParent().getClass());
         startActivity(i);
-        finish(); //termina a atividade liberando memória
+        this.finish(); //termina a atividade liberando memória
+        */
     }
 }

@@ -150,9 +150,9 @@ public class EvaluationActivity extends Activity {
 
     public void backButtonHandler() {
 
-        Intent i = new Intent(this, MenuActivity.class);
-        startActivity(i);
-        this.finish(); //termina a atividade liberando memória
+        //Intent i = new Intent(this, MenuActivity.class);
+        //startActivity(i);
+        finish(); //termina a atividade liberando memória
     }
 
 }
