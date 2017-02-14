@@ -15,9 +15,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,7 +48,7 @@ import br.ufscar.connect.R;
 import br.ufscar.connect.models.User;
 
 
-public class FeedActivity extends Activity {
+public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener{
 
     private static List<FeedProblemPost> feedProblemPostList;
 
@@ -80,6 +82,8 @@ public class FeedActivity extends Activity {
     FeedEvaluationListAdapter evaluationListAdapter;
     FeedProblemListAdapter problemListAdapter;
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -94,6 +98,45 @@ public class FeedActivity extends Activity {
         setContentView(R.layout.activity_feed);
         context = this;
 
+        //SWIPE REFRESH ON LISTVIEW
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                                                    @Override
+                                                    public void onRefresh() {
+                                                        swipeRefreshLayout.setRefreshing(true);
+                                                        //Deixa registrado que as imagens do feed ja foram carregadas uma vez
+                                                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                                                        SharedPreferences.Editor editor = sharedPref.edit();
+                                                        editor.putBoolean("imagesLoaded", false).apply(); //controle do feed
+
+                                                        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                                                        startActivity(intent);
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                swipeRefreshLayout.setRefreshing(false);
+                                                            }
+                                                        }, 1000);
+                                                    }
+                                                });
+
+        //Referencia as variáveis aos objetos do XML
+        cv_separator =       findViewById(R.id.cv_separator);
+
+        btnEvaluations =    (Button) findViewById(R.id.btn_evaluations);
+        btnProblems =       (Button) findViewById(R.id.btn_problems);
+
+        iv_user_photo =     (ImageView) findViewById(R.id.iv_user_photo);
+        iv_publ_photo =     (ImageView) findViewById(R.id.iv_publ_photo);
+
+        tv_username =       (TextView) findViewById(R.id.tv_name);
+        tv_usertype =       (TextView) findViewById(R.id.tv_usertype);
+        tv_date =           (TextView) findViewById(R.id.tv_date);
+        tv_type =           (TextView) findViewById(R.id.tv_type);
+        tv_adrress =        (TextView) findViewById(R.id.tv_address);
+        tv_description =    (TextView) findViewById(R.id.tv_description);
+
+        lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
     }
 
 
@@ -257,6 +300,7 @@ public class FeedActivity extends Activity {
                         })
                         .create()
                         .show();
+            //Se tem a permissao...
             }else{
                 //We have the permission, so we continue...
                 final ProgressDialog progressDialog = new ProgressDialog(context);
@@ -314,24 +358,6 @@ public class FeedActivity extends Activity {
 
                         FeedActivity.feedProblemPostList = feedProblemPostList;
                         FeedActivity.feedEvaluationPostList = feedEvaluationPost;
-
-                        //Referencia as variáveis aos objetos do XML
-                        cv_separator =       findViewById(R.id.cv_separator);
-
-                        btnEvaluations =    (Button) findViewById(R.id.btn_evaluations);
-                        btnProblems =       (Button) findViewById(R.id.btn_problems);
-
-                        iv_user_photo =     (ImageView) findViewById(R.id.iv_user_photo);
-                        iv_publ_photo =     (ImageView) findViewById(R.id.iv_publ_photo);
-
-                        tv_username =       (TextView) findViewById(R.id.tv_name);
-                        tv_usertype =       (TextView) findViewById(R.id.tv_usertype);
-                        tv_date =           (TextView) findViewById(R.id.tv_date);
-                        tv_type =           (TextView) findViewById(R.id.tv_type);
-                        tv_adrress =        (TextView) findViewById(R.id.tv_address);
-                        tv_description =    (TextView) findViewById(R.id.tv_description);
-
-                        lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
 
                         FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
 
@@ -412,24 +438,6 @@ public class FeedActivity extends Activity {
                     FeedActivity.feedProblemPostList = feedProblemPostList;
                     FeedActivity.feedEvaluationPostList = feedEvaluationPost;
 
-                    //Referencia as variáveis aos objetos do XML
-                    cv_separator =       findViewById(R.id.cv_separator);
-
-                    btnEvaluations =    (Button) findViewById(R.id.btn_evaluations);
-                    btnProblems =       (Button) findViewById(R.id.btn_problems);
-
-                    iv_user_photo =     (ImageView) findViewById(R.id.iv_user_photo);
-                    iv_publ_photo =     (ImageView) findViewById(R.id.iv_publ_photo);
-
-                    tv_username =       (TextView) findViewById(R.id.tv_name);
-                    tv_usertype =       (TextView) findViewById(R.id.tv_usertype);
-                    tv_date =           (TextView) findViewById(R.id.tv_date);
-                    tv_type =           (TextView) findViewById(R.id.tv_type);
-                    tv_adrress =        (TextView) findViewById(R.id.tv_address);
-                    tv_description =    (TextView) findViewById(R.id.tv_description);
-
-                    lv_all_publications = (ListView) findViewById(R.id.lv_all_publications);
-
                     FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
 
                     Collections.sort(feedProblemPostList, new CustomComparatorProblemsPosts());
@@ -453,5 +461,10 @@ public class FeedActivity extends Activity {
     }
 
 
+    @Override
+    public void onRefresh() {
+
+
+    }
 }
 
