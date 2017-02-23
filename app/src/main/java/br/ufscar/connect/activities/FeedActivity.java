@@ -46,6 +46,7 @@ import br.ufscar.connect.models.FeedProblemPost;
 import br.ufscar.connect.models.Report;
 import br.ufscar.connect.R;
 import br.ufscar.connect.models.User;
+import br.ufscar.connect.control.ImageManager;
 
 
 public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefreshListener{
@@ -244,6 +245,66 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                 btnProblems.setTextColor(Color.parseColor("#ffcacaca"));
 
                 lv_all_publications.setAdapter(evaluationListAdapter);
+
+                final ProgressDialog progressDialog = new ProgressDialog(context);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressDialog.setMessage("Carregando avaliações...");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+
+                AsyncTask task = new AsyncTask() {
+
+                    final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
+
+                    List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
+
+                    @Override
+                    protected Object doInBackground(Object[] params) {
+                        try {
+
+                            List<Evaluation> evaluationList = api.evaluationList().execute().body();
+
+                            for (Evaluation e : evaluationList) {
+                                User user = api.getUser(e.getUserId()).execute().body();
+
+                                if (user != null) {
+                                    FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
+                                            user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
+                                            e.getLimp(), e.getSeg(), e.getGeral());
+
+                                    feedEvaluationPost.add(post);
+                                }
+                            }
+
+                            return null;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object o) {
+
+                        FeedActivity.feedEvaluationPostList = feedEvaluationPost;
+
+                        Collections.sort(feedEvaluationPost, new CustomComparatorEvaluationsPosts());
+
+                        FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
+
+                        lv_all_publications.setAdapter(evaluationListAdapter);
+
+                        //Deixa registrado que as imagens do feed ja foram carregadas uma vez
+                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putBoolean("imagesLoaded", true).apply(); //controle do feed
+
+                        progressDialog.dismiss();
+
+                    }
+                };
+
+                task.execute();
             }
         }
 
@@ -272,15 +333,6 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-        int id = item.getItemId();
-
-        //Se o usuario escolhe a opcao SAIR, o aplicativo o redireciona para a tela de LOGIN
-        if (id == R.id.action_sair) {
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -306,7 +358,7 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
         alertDialog.setPositiveButton("SIM",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(), "ATÉ LOGO!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Até logo!", Toast.LENGTH_SHORT).show();
 
                         try {
                             finish();
@@ -383,11 +435,11 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                     final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
 
                     List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
-                    List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
 
                     @Override
                     protected Object doInBackground(Object[] params) {
                         try {
+
 
                             List<Report> reportList = api.reportList().execute().body();
 
@@ -398,20 +450,6 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                                             r.getDate(), r.getProblemAddress(), r.getProblemCategory(), r.getProblemDescription(),
                                             r.getProblemPhoto(), user.getUser_photo());
                                     feedProblemPostList.add(post);
-                                }
-                            }
-
-                            List<Evaluation> evaluationList = api.evaluationList().execute().body();
-
-                            for (Evaluation e : evaluationList) {
-                                User user = api.getUser(e.getUserId()).execute().body();
-
-                                if (user != null) {
-                                    FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
-                                            user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
-                                            e.getLimp(), e.getSeg(), e.getGeral());
-
-                                    feedEvaluationPost.add(post);
                                 }
                             }
 
@@ -426,12 +464,9 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                     protected void onPostExecute(Object o) {
 
                         FeedActivity.feedProblemPostList = feedProblemPostList;
-                        FeedActivity.feedEvaluationPostList = feedEvaluationPost;
-
-                        FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
 
                         Collections.sort(feedProblemPostList, new CustomComparatorProblemsPosts());
-                        Collections.sort(feedEvaluationPost, new CustomComparatorEvaluationsPosts());
+
                         FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
                         lv_all_publications.setAdapter(problemListAdapter);
 
@@ -462,7 +497,6 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                 final ConnectUFSCarApi api = ((ConnectApplication) getApplication()).getApi();
 
                 List<FeedProblemPost> feedProblemPostList = new ArrayList<>();
-                List<FeedEvaluationPost> feedEvaluationPost = new ArrayList<>();
 
                 @Override
                 protected Object doInBackground(Object[] params) {
@@ -480,20 +514,6 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                             }
                         }
 
-                        List<Evaluation> evaluationList = api.evaluationList().execute().body();
-
-                        for (Evaluation e : evaluationList) {
-                            User user = api.getUser(e.getUserId()).execute().body();
-
-                            if (user != null) {
-                                FeedEvaluationPost post = new FeedEvaluationPost(user.getUser_photo(), user.getName(),
-                                        user.getUser_type(), e.getDate(), e.getEspaco(), e.getInfra(), e.getAcess(),
-                                        e.getLimp(), e.getSeg(), e.getGeral());
-
-                                feedEvaluationPost.add(post);
-                            }
-                        }
-
                         return null;
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -505,12 +525,10 @@ public class FeedActivity extends Activity implements SwipeRefreshLayout.OnRefre
                 protected void onPostExecute(Object o) {
 
                     FeedActivity.feedProblemPostList = feedProblemPostList;
-                    FeedActivity.feedEvaluationPostList = feedEvaluationPost;
 
                     FeedActivity.this.evaluationListAdapter = new FeedEvaluationListAdapter(FeedActivity.this, feedEvaluationPostList);
 
                     Collections.sort(feedProblemPostList, new CustomComparatorProblemsPosts());
-                    Collections.sort(feedEvaluationPost, new CustomComparatorEvaluationsPosts());
                     FeedActivity.this.problemListAdapter = new FeedProblemListAdapter(FeedActivity.this, feedProblemPostList);
                     lv_all_publications.setAdapter(problemListAdapter);
 

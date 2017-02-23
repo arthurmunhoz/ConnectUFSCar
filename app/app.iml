@@ -140,6 +140,7 @@
     <orderEntry type="library" exported="" name="rxjava-1.1.6" level="project" />
     <orderEntry type="library" exported="" name="roundedimageview-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="compressor-1.0.4" level="project" />
+    <orderEntry type="library" exported="" name="universal-image-loader-1.9.5" level="project" />
     <orderEntry type="library" exported="" name="picasso-transformations-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.1.1" level="project" />

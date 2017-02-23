@@ -121,26 +121,13 @@ public class LoginActivity extends Activity {
 
     private class upToDB extends AsyncTask<Void, Void, Void> {
 
-        ProgressDialog pd = new ProgressDialog(LoginActivity.this);
-
         @Override
         protected void onPreExecute() {
-
-            //set message of the dialog
-            pd.setMessage("Logando sua conta...");
-            pd.setCancelable(false);
-            pd.show();
-
             super.onPreExecute();
         }
 
         @Override
         protected void onPostExecute(Void result) {
-
-            //hide the dialog
-            if (pd.isShowing())
-                pd.dismiss();
-
             super.onPostExecute(result);
         }
 
