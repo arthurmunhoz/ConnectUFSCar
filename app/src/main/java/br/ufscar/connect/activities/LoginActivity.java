@@ -1,7 +1,6 @@
 package br.ufscar.connect.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,8 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import java.io.IOException;
 
 import br.ufscar.connect.ConnectApplication;
 import br.ufscar.connect.models.User;
@@ -44,7 +41,7 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         c = this;
-        et_username = (EditText) findViewById(R.id.et_username);
+        et_username = (EditText) findViewById(R.id.et_email);
         et_password = (EditText) findViewById(R.id.et_password);
         btn_login = (Button) findViewById(R.id.btn_login);
 

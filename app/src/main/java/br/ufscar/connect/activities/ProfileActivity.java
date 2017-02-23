@@ -60,7 +60,7 @@ public class ProfileActivity extends Activity {
         //----------------------------------------------------------------------------------------
         //Referenciando os objetos do XML
         iv_profile_pic = (ImageView) findViewById(R.id.iv_profile_picture);
-        tv_username = (TextView) findViewById(R.id.tv_username);
+        tv_username = (TextView) findViewById(R.id.et_username);
         tv_name = (TextView) findViewById(R.id.tv_name);
         tv_usertype = (TextView) findViewById(R.id.tv_usertype);
         tv_useremail = (TextView) findViewById(R.id.tv_useremail);

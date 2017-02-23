@@ -1,25 +1,18 @@
 package br.ufscar.connect.activities;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -167,10 +160,10 @@ public class EditProfileActivity extends Activity {
         //Initializing fragments of the xml
         btn_concluido = (Button) findViewById(R.id.btn_concluido);
         iv_profile_pic = (ImageView) findViewById(R.id.iv_profile_picture);
-        et_username = (EditText) findViewById(R.id.tv_username);
+        et_username = (EditText) findViewById(R.id.et_username);
         et_name = (EditText) findViewById(R.id.et_name);
         et_last_name = (EditText) findViewById(R.id.et_last_name);
-        et_email = (EditText) findViewById(R.id.et_username);
+        et_email = (EditText) findViewById(R.id.et_email);
         et_password = (EditText) findViewById(R.id.et_password);
         et_password_conf = (EditText) findViewById(R.id.et_password_conf);
 

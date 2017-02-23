@@ -13,10 +13,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -60,7 +58,7 @@ import retrofit.Retrofit;
 
 
 @SuppressWarnings("ALL")
-public class SignUpActivity extends Activity {
+public class SignUpActivity extends Activity implements View.OnFocusChangeListener {
 
     public static final int MY_PERMISSIONS_READ_EXTERNAL_STORAGE = 0;
     static final int REQUEST_CAMERA = 1;
@@ -146,7 +144,6 @@ public class SignUpActivity extends Activity {
     Uri imageUri = null;
     private ConnectUFSCarApi api;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,21 +160,27 @@ public class SignUpActivity extends Activity {
 
         //---------------------------------------------------------
         //Refereciando os objetos do XML
-        et_username = (EditText) findViewById(R.id.tv_username);
+        et_username = (EditText) findViewById(R.id.et_username);
         et_name = (EditText) findViewById(R.id.et_name);
         et_last_name = (EditText) findViewById(R.id.et_last_name);
-        et_email = (EditText) findViewById(R.id.et_username);
+        et_email = (EditText) findViewById(R.id.et_email);
         et_password = (EditText) findViewById(R.id.et_password);
         et_password_conf = (EditText) findViewById(R.id.et_password_conf);
         iv_profile_pic = (ImageView) findViewById(R.id.iv_profile_picture);
         iv_profile_pic.setImageResource(R.drawable.usericon2);
+        et_username.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                    if (b == true)
+                        et_username.setError("Digite apenas letras minúsculas");
+            }
+        });
     }
 
     public void onButtonClick(View v) {
 
         //--------------------------------------------------------------------
         //Clicou no botão ALTERAR FOTO ou na imagem de perfil
-
         if (v.getId() == R.id.iv_profile_picture || v.getId() == R.id.tv_changePicture) {
 
             //Request STORAGE Permission
@@ -377,7 +380,7 @@ public class SignUpActivity extends Activity {
 
             String aux = et_username.getText().toString().toLowerCase();
             et_username.setText(aux);
-            Toast.makeText(getApplicationContext(), "Nome de usuário convertido em letras minúsculas", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "'Nome de usuário' convertido para letras minúsculas", Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -464,6 +467,11 @@ public class SignUpActivity extends Activity {
         });
 
         builder.build().load(imageUri).transform(new CropCircleTransformation()).into(iv_profile_pic);
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean b) {
+
     }
 
     //Envia as fotos no formato Uri para o servidor Cloudinary
