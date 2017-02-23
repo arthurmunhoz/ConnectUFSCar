@@ -364,6 +364,23 @@ public class SignUpActivity extends Activity {
             et_username.setError("Digite um Nome de Usuário");
             return false;
         }
+
+        if (user.getUsername().contains("A") || user.getUsername().contains("B") || user.getUsername().contains("C") ||
+                user.getUsername().contains("D") || user.getUsername().contains("E") || user.getUsername().contains("F") ||
+                user.getUsername().contains("G") || user.getUsername().contains("H") || user.getUsername().contains("I") ||
+                user.getUsername().contains("J") || user.getUsername().contains("K") || user.getUsername().contains("L") ||
+                user.getUsername().contains("M") || user.getUsername().contains("N") || user.getUsername().contains("O") ||
+                user.getUsername().contains("P") || user.getUsername().contains("Q") || user.getUsername().contains("R") ||
+                user.getUsername().contains("S") || user.getUsername().contains("T") || user.getUsername().contains("U") ||
+                user.getUsername().contains("V") || user.getUsername().contains("X") || user.getUsername().contains("Y") ||
+                user.getUsername().contains("Z") || user.getUsername().contains("W")){
+
+            String aux = et_username.getText().toString().toLowerCase();
+            et_username.setText(aux);
+            Toast.makeText(getApplicationContext(), "Nome de usuário convertido em letras minúsculas", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         if (user.getName().length() == 0) {
             et_name.setError("Digite seu nome");
             return false;
