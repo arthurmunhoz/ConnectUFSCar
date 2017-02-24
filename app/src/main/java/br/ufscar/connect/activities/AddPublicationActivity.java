@@ -23,7 +23,6 @@ public class AddPublicationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addpublication);
 
-
     }
 
     @Override

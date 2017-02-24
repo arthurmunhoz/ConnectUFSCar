@@ -222,9 +222,10 @@
                 android:textSize="18dp"
                 android:clickable="true"
                 android:enabled="true"
+                android:onClick="onButtonClick"
                 android:selectAllOnFocus="true"
                 android:autoText="false"
-                android:textStyle="normal" />
+                android:contentDescription="Digite apenas letras minúsculas" />
 
         </RelativeLayout>
 

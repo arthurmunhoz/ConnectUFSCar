@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -65,6 +67,7 @@ public class SignUpActivity extends Activity implements View.OnFocusChangeListen
     static final int SELECT_FILE = 2;
     //---------------------------------------------
     // Declarando variaveis
+    ExifInterface exif;
     Map resultMap = new Map() {
         @Override
         public int size() {
@@ -237,18 +240,8 @@ public class SignUpActivity extends Activity implements View.OnFocusChangeListen
                         // Exibe mensagem de sucesso
                         Toast.makeText(getApplicationContext(), "Cadastro realizado com sucesso!", Toast.LENGTH_LONG).show();
 
-                        //Salva os dados do usuario em SharedPreferences para uso em outras activites
-                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("name", user.getName()).apply();
-                        editor.putString("lastname", user.getLast_name()).apply();
-                        editor.putString("email", user.getEmail()).apply();
-                        editor.putString("usertype", user.getUser_type()).apply();
-                        editor.putString("image_url", user.getUser_photo()).apply();
-                        editor.putString("username", user.getUsername()).apply();
-
                         //Inicia o aplicativo
-                        startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
+                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                         finish();
 
                     } else {
@@ -507,21 +500,35 @@ public class SignUpActivity extends Activity implements View.OnFocusChangeListen
 
             if (cameraImage != null) {
 
+                // REDUZINDO/CONVERTENDO/MANIPULANDO a foto tirada pelo usuário para o upload
+                // ser feito de forma correta, sem rotacionar a imagem ao enviar ao servidor Cloudinary
                 //Primeiro reduzimos o tamanho da imagem obtida da camera
                 cameraImageResized = getResizedBitmap(cameraImage, 600);
                 //Depois, pegamos o 'path' dessa imagem Bitmap
                 imageUri = getImageUri(SignUpActivity.this, cameraImageResized);
                 //Por ultimo, pegamos o 'path' real da imagem Uri para passar ao CLoudinary
                 imagePath = getPath(imageUri);
+                //Criando um imagem do tipo arquivo para manipular a orientação e salvar corretamente no Cloudinary
+                imageFile = new File(imagePath);
 
+                exif = null;
+                try {
+                    exif = new ExifInterface(imagePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
 
+                Bitmap bmRotated = rotateBitmap(cameraImageResized, orientation);
+
+                //--------------------------------------------
                 //Iniciando upload da imagem usando Couldinary
                 config = new HashMap();
                 config.put("cloud_name", "cloud-connectufscar");
                 config.put("api_key", "726282638648912");
                 config.put("api_secret", "eLEY62xvmZIgIXeBZYGLdLXKFgE");
                 mobileCloudinary = new Cloudinary(config);
-
                 try {
                     resultMap = mobileCloudinary.uploader().upload(imagePath, ObjectUtils.emptyMap());
                 } catch (IOException e) {
@@ -597,4 +604,53 @@ public class SignUpActivity extends Activity implements View.OnFocusChangeListen
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
+
+    //---------------------------------------------------------------------
+    // THIS FUNCTIONS MANAGE THE PHOTOS TAKEN FROM THE CAMERA SO THEY DONT
+    // GET ROTATED WHEN SENT TO THE Cloudinary SERVER
+    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
+
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
+        }
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        }
+        catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 }
